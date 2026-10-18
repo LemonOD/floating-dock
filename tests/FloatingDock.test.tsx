@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FloatingDock, type DockItem, type DockLinkProps } from "../src/FloatingDock";
 
@@ -187,6 +187,30 @@ describe("FloatingDock", () => {
       await user.click(screen.getByRole("button", { name: "Sign out" }));
       expect(onClick).toHaveBeenCalledTimes(1);
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    });
+  });
+
+  describe("hideOnScroll", () => {
+    const scrollTo = (y: number) => {
+      Object.defineProperty(window, "scrollY", { value: y, configurable: true });
+      act(() => {
+        window.dispatchEvent(new Event("scroll"));
+      });
+    };
+    afterEach(() => scrollTo(0));
+
+    it("hides on scroll down and returns on scroll up", () => {
+      render(<FloatingDock items={ITEMS} isActive={() => false} hideOnScroll />);
+      scrollTo(200);
+      expect(bar()).toHaveClass("rfd-bar--hidden");
+      scrollTo(150);
+      expect(bar()).not.toHaveClass("rfd-bar--hidden");
+    });
+
+    it("never hides when the option is off", () => {
+      render(<FloatingDock items={ITEMS} isActive={() => false} />);
+      scrollTo(400);
+      expect(bar()).not.toHaveClass("rfd-bar--hidden");
     });
   });
 });

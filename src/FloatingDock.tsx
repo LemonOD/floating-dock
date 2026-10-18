@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ComponentType, type ReactNode } from "react";
+import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { DockDrawer } from "./DockDrawer";
 import { MoreHorizontalIcon } from "./icons";
@@ -66,6 +66,8 @@ export interface FloatingDockProps {
   /** @default "Main" */
   ariaLabel?: string;
   className?: string;
+  /** Slide the dock out of view while scrolling down and bring it back on scroll up. @default false */
+  hideOnScroll?: boolean;
 }
 
 const DefaultLink: ComponentType<DockLinkProps> = ({ href, children, ...rest }) => (
@@ -73,6 +75,30 @@ const DefaultLink: ComponentType<DockLinkProps> = ({ href, children, ...rest }) 
     {children}
   </a>
 );
+
+const SCROLL_HIDE_AFTER = 80;
+const SCROLL_DELTA = 8;
+
+function useHiddenOnScroll(enabled: boolean) {
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    if (!enabled) {
+      setHidden(false);
+      return;
+    }
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+      if (Math.abs(delta) < SCROLL_DELTA) return;
+      setHidden(delta > 0 && y > SCROLL_HIDE_AFTER);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [enabled]);
+  return hidden;
+}
 
 function Badge({ value }: { value: number | string | boolean | undefined }) {
   if (!value) return null;
@@ -96,16 +122,21 @@ export function FloatingDock({
   extraContent,
   ariaLabel = "Main",
   className,
+  hideOnScroll = false,
 }: FloatingDockProps) {
   const [moreOpen, setMoreOpen] = useState(false);
   const hasMore = moreItems.length > 0;
   const moreActive = hasMore && moreItems.some((item) => item.href !== undefined && isActive(item.href));
+  const hidden = useHiddenOnScroll(hideOnScroll);
+  const [focusWithin, setFocusWithin] = useState(false);
 
   return (
     <>
       <nav
         aria-label={ariaLabel}
-        className={["rfd-bar", className].filter(Boolean).join(" ")}
+        className={["rfd-bar", hidden && !focusWithin && "rfd-bar--hidden", className].filter(Boolean).join(" ")}
+        onFocus={() => setFocusWithin(true)}
+        onBlur={() => setFocusWithin(false)}
       >
         <div className="rfd-track">
           {items.map((item) => {

@@ -32,6 +32,15 @@
   max-width: var(--rfd-max-width);
   z-index: 40;
   font-family: var(--rfd-font);
+  transition: transform 0.25s ease;
+}
+.rfd-bar--hidden {
+  transform: translateY(calc(100% + var(--rfd-offset) + env(safe-area-inset-bottom, 0px)));
+}
+@media (prefers-reduced-motion: reduce) {
+  .rfd-bar {
+    transition: none;
+  }
 }
 
 .rfd-track {
