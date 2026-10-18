@@ -11,6 +11,11 @@ export interface DockItem {
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
+  /**
+   * A count (`5`), short text (`"99+"`), or `true` for a plain dot. Falsy values and `0` render nothing.
+   * Numbers and text are part of the item's accessible name.
+   */
+  badge?: number | string | boolean;
 }
 
 export interface DockLinkProps {
@@ -53,6 +58,12 @@ const DefaultLink: ComponentType<DockLinkProps> = ({ href, children, ...rest }) 
   </a>
 );
 
+function Badge({ value }: { value: number | string | boolean | undefined }) {
+  if (!value) return null;
+  if (value === true) return <span className="rfd-badge rfd-badge--dot" aria-hidden="true" />;
+  return <span className="rfd-badge">{value}</span>;
+}
+
 /**
  * A floating, fully-rounded bottom navigation bar in the style of WhatsApp's mobile tab bar: an
  * animated pill highlights the active tab, and a "More" button opens the rest of your destinations
@@ -81,7 +92,7 @@ export function FloatingDock({
         className={["rfd-bar", className].filter(Boolean).join(" ")}
       >
         <div className="rfd-track">
-          {items.map(({ key, href, label, icon: Icon }) => {
+          {items.map(({ key, href, label, icon: Icon, badge }) => {
             const active = isActive(href);
             return (
               <LinkComponent key={key} href={href} className="rfd-tab" aria-current={active ? "page" : undefined}>
@@ -94,6 +105,7 @@ export function FloatingDock({
                 )}
                 <Icon className={active ? "rfd-icon rfd-icon--active" : "rfd-icon"} />
                 <span className={active ? "rfd-label rfd-label--active" : "rfd-label"}>{label}</span>
+                <Badge value={badge} />
               </LinkComponent>
             );
           })}
@@ -111,12 +123,13 @@ export function FloatingDock({
       {hasMore && (
         <DockDrawer open={moreOpen} onClose={() => setMoreOpen(false)} title={moreSheetTitle} closeLabel={closeLabel}>
           <div className="rfd-more-grid">
-            {moreItems.map(({ key, href, label, icon: Icon }) => {
+            {moreItems.map(({ key, href, label, icon: Icon, badge }) => {
               const active = isActive(href);
               return (
                 <LinkComponent key={key} href={href} className="rfd-more-item" onClick={() => setMoreOpen(false)}>
                   <span className={active ? "rfd-more-icon-circle rfd-more-icon-circle--active" : "rfd-more-icon-circle"}>
                     <Icon className="rfd-more-icon" />
+                    <Badge value={badge} />
                   </span>
                   <span className="rfd-more-label">{label}</span>
                 </LinkComponent>

@@ -134,4 +134,25 @@ describe("FloatingDock", () => {
     render(<FloatingDock items={ITEMS} isActive={() => false} ariaLabel="Primary navigation" />);
     expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeInTheDocument();
   });
+
+  describe("badges", () => {
+    it("renders a count badge as part of the link's name", () => {
+      render(<FloatingDock items={[{ ...ITEMS[0]!, badge: 5 }]} isActive={() => false} />);
+      expect(within(bar()).getByRole("link", { name: "Home5" })).toBeInTheDocument();
+    });
+
+    it("renders a dot for `true` and nothing for 0 / false", () => {
+      render(
+        <FloatingDock
+          items={[
+            { ...ITEMS[0]!, badge: true },
+            { ...ITEMS[1]!, badge: 0 },
+          ]}
+          isActive={() => false}
+        />,
+      );
+      expect(bar().querySelectorAll(".rfd-badge")).toHaveLength(1);
+      expect(bar().querySelector(".rfd-badge--dot")).not.toBeNull();
+    });
+  });
 });
