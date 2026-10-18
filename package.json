@@ -1,6 +1,6 @@
 {
   "name": "react-floating-dock",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A WhatsApp-style floating bottom navigation dock for React, with an animated active-tab pill and an overflow sheet for extra destinations. Framework-agnostic — bring your own router.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -8,12 +8,19 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/style.css",
+    "./styles.css": "./dist/style.css"
   },
+  "style": "./dist/style.css",
   "files": [
     "dist"
   ],
@@ -40,6 +47,14 @@
     "dock",
     "bottom-sheet"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LemonOD/floating-dock.git"
+  },
+  "homepage": "https://github.com/LemonOD/floating-dock#readme",
+  "bugs": {
+    "url": "https://github.com/LemonOD/floating-dock/issues"
+  },
   "author": "Lemon Oluwatobi",
   "license": "MIT",
   "peerDependencies": {

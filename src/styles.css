@@ -15,15 +15,71 @@
   --rfd-hover: rgba(255, 255, 255, 0.06);
   --rfd-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.35);
   --rfd-radius: 9999px;
+  --rfd-max-width: 32rem;
+  --rfd-offset: 0.75rem;
+  --rfd-badge-bg: #ef4444;
+  --rfd-badge-text: #ffffff;
+  /* Height the dock occupies from the bottom of the viewport; <FloatingDockSpacer /> uses it. */
+  --rfd-height: calc(4.5rem + var(--rfd-offset) * 2 + env(safe-area-inset-bottom, 0px));
   --rfd-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .rfd-bar {
   position: fixed;
-  left: 0.75rem;
-  right: 0.75rem;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--rfd-offset) + env(safe-area-inset-bottom, 0px));
+  margin-inline: auto;
+  width: calc(100% - 2 * var(--rfd-offset));
+  max-width: var(--rfd-max-width);
   z-index: 40;
   font-family: var(--rfd-font);
+  transition: transform 0.25s ease;
+}
+.rfd-bar--hidden {
+  transform: translateY(calc(100% + var(--rfd-offset) + env(safe-area-inset-bottom, 0px)));
+}
+@media (prefers-reduced-motion: reduce) {
+  .rfd-bar {
+    transition: none;
+  }
+}
+
+.rfd-spacer {
+  height: var(--rfd-height);
+  flex-shrink: 0;
+}
+
+/* --- Themes: set `theme` on <FloatingDock /> (the default is dark) --- */
+
+[data-rfd-theme="light"] {
+  --rfd-bg: rgba(255, 255, 255, 0.92);
+  --rfd-bg-solid: #ffffff;
+  --rfd-border: #e2e8f0;
+  --rfd-text: #0f172a;
+  --rfd-text-muted: #64748b;
+  --rfd-accent-bg: rgba(59, 130, 246, 0.12);
+  --rfd-hover: rgba(15, 23, 42, 0.05);
+  --rfd-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.15);
+}
+
+[data-rfd-theme="frosted"] {
+  --rfd-bg: rgba(255, 255, 255, 0.55);
+  --rfd-bg-solid: rgba(255, 255, 255, 0.85);
+  --rfd-border: rgba(255, 255, 255, 0.6);
+  --rfd-text: #0f172a;
+  --rfd-text-muted: #475569;
+  --rfd-accent-bg: rgba(255, 255, 255, 0.7);
+  --rfd-hover: rgba(15, 23, 42, 0.06);
+  --rfd-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+}
+[data-rfd-theme="frosted"] .rfd-track {
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+[data-rfd-theme="frosted"] .rfd-sheet {
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 
 .rfd-track {
@@ -66,6 +122,66 @@
   inset: 0;
   border-radius: var(--rfd-radius);
   background: var(--rfd-accent-bg);
+}
+
+/* --- Badges and action buttons --- */
+
+.rfd-badge {
+  position: absolute;
+  top: 0.4rem;
+  left: calc(50% + 0.35rem);
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.3rem;
+  box-sizing: border-box;
+  border-radius: 9999px;
+  background: var(--rfd-badge-bg);
+  color: var(--rfd-badge-text);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1rem;
+  text-align: center;
+  pointer-events: none;
+}
+.rfd-badge--dot {
+  min-width: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  top: 0.55rem;
+  left: calc(50% + 0.5rem);
+}
+.rfd-more-icon-circle {
+  position: relative;
+}
+.rfd-more-icon-circle .rfd-badge {
+  top: 0;
+  left: auto;
+  right: -0.1rem;
+}
+.rfd-more-icon-circle .rfd-badge--dot {
+  top: 0.25rem;
+  right: 0.25rem;
+}
+
+.rfd-prominent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-top: -1.1rem;
+  border-radius: var(--rfd-radius);
+  background: var(--rfd-accent);
+  color: var(--rfd-accent-contrast);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+}
+.rfd-prominent-icon {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+.rfd-label--prominent {
+  margin-top: 0.125rem;
 }
 
 .rfd-icon {
@@ -130,7 +246,22 @@
   }
 }
 
+.rfd-sheet-grab {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+  touch-action: none;
+  cursor: grab;
+}
+.rfd-handle {
+  width: 2.25rem;
+  height: 0.25rem;
+  border-radius: 9999px;
+  background: var(--rfd-border);
+}
+
 .rfd-sheet-header {
+  touch-action: none;
   display: flex;
   align-items: center;
   justify-content: space-between;

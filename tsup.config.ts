@@ -6,6 +6,6 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  treeshake: true,
+  banner: { js: '"use client";' },
   external: ["react", "react-dom", "framer-motion"],
 });

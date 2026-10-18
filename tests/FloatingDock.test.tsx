@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { FloatingDock, type DockItem, type DockLinkProps } from "../src/FloatingDock";
+import { FloatingDock, FloatingDockSpacer, type DockItem, type DockLinkProps } from "../src/FloatingDock";
 
 // jsdom cannot navigate; swallow clicks on real anchors so they don't log "not implemented" noise.
 const swallowLinkNavigation = (e: MouseEvent) => {
@@ -133,5 +133,99 @@ describe("FloatingDock", () => {
   it("uses a custom aria-label for the bar", () => {
     render(<FloatingDock items={ITEMS} isActive={() => false} ariaLabel="Primary navigation" />);
     expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeInTheDocument();
+  });
+
+  describe("badges", () => {
+    it("renders a count badge as part of the link's name", () => {
+      render(<FloatingDock items={[{ ...ITEMS[0]!, badge: 5 }]} isActive={() => false} />);
+      expect(within(bar()).getByRole("link", { name: "Home5" })).toBeInTheDocument();
+    });
+
+    it("renders a dot for `true` and nothing for 0 / false", () => {
+      render(
+        <FloatingDock
+          items={[
+            { ...ITEMS[0]!, badge: true },
+            { ...ITEMS[1]!, badge: 0 },
+          ]}
+          isActive={() => false}
+        />,
+      );
+      expect(bar().querySelectorAll(".rfd-badge")).toHaveLength(1);
+      expect(bar().querySelector(".rfd-badge--dot")).not.toBeNull();
+    });
+  });
+
+  describe("action items", () => {
+    it("renders a button that calls onClick and is not a link", async () => {
+      const onClick = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <FloatingDock
+          items={[ITEMS[0]!, { key: "new", label: "Create", icon: Icon, onClick, prominent: true }]}
+          isActive={() => false}
+        />,
+      );
+      const button = within(bar()).getByRole("button", { name: "Create" });
+      expect(button).toHaveClass("rfd-tab--prominent");
+      await user.click(button);
+      expect(onClick).toHaveBeenCalledTimes(1);
+      expect(within(bar()).getAllByRole("link")).toHaveLength(1);
+    });
+
+    it("runs a More-sheet action and closes the sheet", async () => {
+      const onClick = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <FloatingDock
+          items={ITEMS}
+          moreItems={[{ key: "out", label: "Sign out", icon: Icon, onClick }]}
+          isActive={() => false}
+        />,
+      );
+      await user.click(screen.getByRole("button", { name: "More" }));
+      await user.click(screen.getByRole("button", { name: "Sign out" }));
+      expect(onClick).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    });
+  });
+
+  describe("theme", () => {
+    it("sets data-rfd-theme only when a theme is given", () => {
+      const { rerender } = render(<FloatingDock items={ITEMS} isActive={() => false} />);
+      expect(bar()).not.toHaveAttribute("data-rfd-theme");
+      rerender(<FloatingDock items={ITEMS} isActive={() => false} theme="frosted" />);
+      expect(bar()).toHaveAttribute("data-rfd-theme", "frosted");
+    });
+  });
+
+  describe("hideOnScroll", () => {
+    const scrollTo = (y: number) => {
+      Object.defineProperty(window, "scrollY", { value: y, configurable: true });
+      act(() => {
+        window.dispatchEvent(new Event("scroll"));
+      });
+    };
+    afterEach(() => scrollTo(0));
+
+    it("hides on scroll down and returns on scroll up", () => {
+      render(<FloatingDock items={ITEMS} isActive={() => false} hideOnScroll />);
+      scrollTo(200);
+      expect(bar()).toHaveClass("rfd-bar--hidden");
+      scrollTo(150);
+      expect(bar()).not.toHaveClass("rfd-bar--hidden");
+    });
+
+    it("never hides when the option is off", () => {
+      render(<FloatingDock items={ITEMS} isActive={() => false} />);
+      scrollTo(400);
+      expect(bar()).not.toHaveClass("rfd-bar--hidden");
+    });
+  });
+
+  it("FloatingDockSpacer renders an aria-hidden block", () => {
+    const { container } = render(<FloatingDockSpacer />);
+    expect(container.firstElementChild).toHaveClass("rfd-spacer");
+    expect(container.firstElementChild).toHaveAttribute("aria-hidden", "true");
   });
 });
