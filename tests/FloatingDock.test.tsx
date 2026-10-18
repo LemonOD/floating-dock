@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FloatingDock, type DockItem, type DockLinkProps } from "../src/FloatingDock";
@@ -153,6 +153,40 @@ describe("FloatingDock", () => {
       );
       expect(bar().querySelectorAll(".rfd-badge")).toHaveLength(1);
       expect(bar().querySelector(".rfd-badge--dot")).not.toBeNull();
+    });
+  });
+
+  describe("action items", () => {
+    it("renders a button that calls onClick and is not a link", async () => {
+      const onClick = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <FloatingDock
+          items={[ITEMS[0]!, { key: "new", label: "Create", icon: Icon, onClick, prominent: true }]}
+          isActive={() => false}
+        />,
+      );
+      const button = within(bar()).getByRole("button", { name: "Create" });
+      expect(button).toHaveClass("rfd-tab--prominent");
+      await user.click(button);
+      expect(onClick).toHaveBeenCalledTimes(1);
+      expect(within(bar()).getAllByRole("link")).toHaveLength(1);
+    });
+
+    it("runs a More-sheet action and closes the sheet", async () => {
+      const onClick = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <FloatingDock
+          items={ITEMS}
+          moreItems={[{ key: "out", label: "Sign out", icon: Icon, onClick }]}
+          isActive={() => false}
+        />,
+      );
+      await user.click(screen.getByRole("button", { name: "More" }));
+      await user.click(screen.getByRole("button", { name: "Sign out" }));
+      expect(onClick).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     });
   });
 });

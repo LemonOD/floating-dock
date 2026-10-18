@@ -5,10 +5,9 @@ import { motion } from "framer-motion";
 import { DockDrawer } from "./DockDrawer";
 import { MoreHorizontalIcon } from "./icons";
 
-export interface DockItem {
+export interface DockItemBase {
   /** Unique React key. Usually the same as `href`. */
   key: string;
-  href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
   /**
@@ -17,6 +16,23 @@ export interface DockItem {
    */
   badge?: number | string | boolean;
 }
+
+/** A navigable destination, rendered through `LinkComponent`. */
+export interface DockLinkItem extends DockItemBase {
+  href: string;
+  onClick?: never;
+  prominent?: never;
+}
+
+/** A button that runs an action instead of navigating — e.g. a centre "Create" button. */
+export interface DockActionItem extends DockItemBase {
+  onClick: () => void;
+  href?: never;
+  /** Render as a raised, accent-filled button (like the centre button on Instagram or TikTok). */
+  prominent?: boolean;
+}
+
+export type DockItem = DockLinkItem | DockActionItem;
 
 export interface DockLinkProps {
   href: string;
@@ -83,7 +99,7 @@ export function FloatingDock({
 }: FloatingDockProps) {
   const [moreOpen, setMoreOpen] = useState(false);
   const hasMore = moreItems.length > 0;
-  const moreActive = hasMore && moreItems.some((item) => isActive(item.href));
+  const moreActive = hasMore && moreItems.some((item) => item.href !== undefined && isActive(item.href));
 
   return (
     <>
@@ -92,10 +108,31 @@ export function FloatingDock({
         className={["rfd-bar", className].filter(Boolean).join(" ")}
       >
         <div className="rfd-track">
-          {items.map(({ key, href, label, icon: Icon, badge }) => {
-            const active = isActive(href);
+          {items.map((item) => {
+            const { key, label, icon: Icon, badge } = item;
+            if (item.href === undefined) {
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={item.onClick}
+                  className={item.prominent ? "rfd-tab rfd-tab--prominent" : "rfd-tab"}
+                >
+                  {item.prominent ? (
+                    <span className="rfd-prominent">
+                      <Icon className="rfd-prominent-icon" />
+                    </span>
+                  ) : (
+                    <Icon className="rfd-icon" />
+                  )}
+                  <span className={item.prominent ? "rfd-label rfd-label--prominent" : "rfd-label"}>{label}</span>
+                  <Badge value={badge} />
+                </button>
+              );
+            }
+            const active = isActive(item.href);
             return (
-              <LinkComponent key={key} href={href} className="rfd-tab" aria-current={active ? "page" : undefined}>
+              <LinkComponent key={key} href={item.href} className="rfd-tab" aria-current={active ? "page" : undefined}>
                 {active && (
                   <motion.span
                     layoutId="rfd-pill"
@@ -123,14 +160,34 @@ export function FloatingDock({
       {hasMore && (
         <DockDrawer open={moreOpen} onClose={() => setMoreOpen(false)} title={moreSheetTitle} closeLabel={closeLabel}>
           <div className="rfd-more-grid">
-            {moreItems.map(({ key, href, label, icon: Icon, badge }) => {
-              const active = isActive(href);
+            {moreItems.map((item) => {
+              const { key, label, icon: Icon, badge } = item;
+              const active = item.href !== undefined && isActive(item.href);
+              const circle = (
+                <span className={active ? "rfd-more-icon-circle rfd-more-icon-circle--active" : "rfd-more-icon-circle"}>
+                  <Icon className="rfd-more-icon" />
+                  <Badge value={badge} />
+                </span>
+              );
+              if (item.href === undefined) {
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    className="rfd-more-item"
+                    onClick={() => {
+                      setMoreOpen(false);
+                      item.onClick();
+                    }}
+                  >
+                    {circle}
+                    <span className="rfd-more-label">{label}</span>
+                  </button>
+                );
+              }
               return (
-                <LinkComponent key={key} href={href} className="rfd-more-item" onClick={() => setMoreOpen(false)}>
-                  <span className={active ? "rfd-more-icon-circle rfd-more-icon-circle--active" : "rfd-more-icon-circle"}>
-                    <Icon className="rfd-more-icon" />
-                    <Badge value={badge} />
-                  </span>
+                <LinkComponent key={key} href={item.href} className="rfd-more-item" onClick={() => setMoreOpen(false)}>
+                  {circle}
                   <span className="rfd-more-label">{label}</span>
                 </LinkComponent>
               );
