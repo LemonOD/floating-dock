@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { DockDrawer, type DockTheme } from "./DockDrawer";
 import { MoreHorizontalIcon } from "./icons";
 
-export interface DockItemBase {
+interface DockItemBase {
   /** Unique React key. Usually the same as `href`. */
   key: string;
   label: string;
