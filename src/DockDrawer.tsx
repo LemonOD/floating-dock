@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { CloseIcon } from "./icons";
@@ -14,6 +14,9 @@ export interface DockDrawerProps {
   closeLabel?: string;
 }
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /**
  * A bottom sheet on narrow viewports, a centered modal from `sm` up. Used by {@link FloatingDock}
  * for its overflow menu, but works standalone for any mobile-style sheet.
@@ -22,6 +25,16 @@ export function DockDrawer({ open, onClose, title, children, closeLabel = "Close
   // Portals need a DOM node, which doesn't exist during SSR — render nothing until mounted client-side.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Move focus into the dialog on open and hand it back to whatever opened it on close.
+  useEffect(() => {
+    if (!open || !mounted) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    dialogRef.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
+    return () => opener?.focus();
+  }, [open, mounted]);
 
   useEffect(() => {
     if (!open) return;
@@ -35,7 +48,24 @@ export function DockDrawer({ open, onClose, title, children, closeLabel = "Close
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") return onClose();
+      if (event.key !== "Tab") return;
+      // Keep Tab cycling inside the dialog.
+      const focusable = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) return event.preventDefault();
+      const current = document.activeElement;
+      if (!dialogRef.current?.contains(current)) {
+        event.preventDefault();
+        first.focus();
+      } else if (event.shiftKey && current === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && current === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -55,6 +85,7 @@ export function DockDrawer({ open, onClose, title, children, closeLabel = "Close
             onClick={onClose}
           />
           <motion.div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label={title}

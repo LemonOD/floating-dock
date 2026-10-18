@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -105,5 +106,51 @@ describe("DockDrawer", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     rerender(drawer(true, onClose));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("moves focus into the dialog on open", () => {
+    render(drawer(true));
+    expect(screen.getByRole("button", { name: "Close" })).toHaveFocus();
+  });
+
+  it("returns focus to the opener on close", () => {
+    function Harness() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <button onClick={() => setOpen(true)}>Open</button>
+          <DockDrawer open={open} onClose={() => setOpen(false)} title="Menu">
+            <p>Body</p>
+          </DockDrawer>
+        </>
+      );
+    }
+    return (async () => {
+      const user = userEvent.setup();
+      render(<Harness />);
+      await user.click(screen.getByRole("button", { name: "Open" }));
+      expect(screen.getByRole("button", { name: "Close" })).toHaveFocus();
+      await user.keyboard("{Escape}");
+      expect(screen.getByRole("button", { name: "Open" })).toHaveFocus();
+    })();
+  });
+
+  it("traps Tab and Shift+Tab inside the dialog", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <button>Outside</button>
+        {drawer(true, vi.fn(), <a href="/x">Inside link</a>)}
+      </>,
+    );
+    const close = screen.getByRole("button", { name: "Close" });
+    const link = screen.getByRole("link", { name: "Inside link" });
+    expect(close).toHaveFocus();
+    await user.tab();
+    expect(link).toHaveFocus();
+    await user.tab();
+    expect(close).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(link).toHaveFocus();
   });
 });
