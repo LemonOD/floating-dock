@@ -19,6 +19,8 @@
   --rfd-offset: 0.75rem;
   --rfd-badge-bg: #ef4444;
   --rfd-badge-text: #ffffff;
+  /* Height the dock occupies from the bottom of the viewport; <FloatingDockSpacer /> uses it. */
+  --rfd-height: calc(4.5rem + var(--rfd-offset) * 2 + env(safe-area-inset-bottom, 0px));
   --rfd-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -41,6 +43,11 @@
   .rfd-bar {
     transition: none;
   }
+}
+
+.rfd-spacer {
+  height: var(--rfd-height);
+  flex-shrink: 0;
 }
 
 .rfd-track {

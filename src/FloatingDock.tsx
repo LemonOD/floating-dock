@@ -107,6 +107,14 @@ function Badge({ value }: { value: number | string | boolean | undefined }) {
 }
 
 /**
+ * Empty block as tall as the dock, so fixed-position dock never covers the end of your page.
+ * Place it as the last child of your scrolling content.
+ */
+export function FloatingDockSpacer({ className }: { className?: string }) {
+  return <div aria-hidden="true" className={["rfd-spacer", className].filter(Boolean).join(" ")} />;
+}
+
+/**
  * A floating, fully-rounded bottom navigation bar in the style of WhatsApp's mobile tab bar: an
  * animated pill highlights the active tab, and a "More" button opens the rest of your destinations
  * in a bottom sheet. Framework-agnostic — bring your own router via `LinkComponent`.

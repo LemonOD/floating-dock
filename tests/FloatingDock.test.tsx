@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { FloatingDock, type DockItem, type DockLinkProps } from "../src/FloatingDock";
+import { FloatingDock, FloatingDockSpacer, type DockItem, type DockLinkProps } from "../src/FloatingDock";
 
 // jsdom cannot navigate; swallow clicks on real anchors so they don't log "not implemented" noise.
 const swallowLinkNavigation = (e: MouseEvent) => {
@@ -212,5 +212,11 @@ describe("FloatingDock", () => {
       scrollTo(400);
       expect(bar()).not.toHaveClass("rfd-bar--hidden");
     });
+  });
+
+  it("FloatingDockSpacer renders an aria-hidden block", () => {
+    const { container } = render(<FloatingDockSpacer />);
+    expect(container.firstElementChild).toHaveClass("rfd-spacer");
+    expect(container.firstElementChild).toHaveAttribute("aria-hidden", "true");
   });
 });

@@ -1,4 +1,4 @@
-export { FloatingDock } from "./FloatingDock";
+export { FloatingDock, FloatingDockSpacer } from "./FloatingDock";
 export type { DockItem, DockLinkItem, DockActionItem, DockLinkProps, FloatingDockProps } from "./FloatingDock";
 
 export { DockDrawer } from "./DockDrawer";
