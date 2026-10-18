@@ -12,7 +12,11 @@ export interface DockDrawerProps {
   children: ReactNode;
   /** aria-label for the close button. @default "Close" */
   closeLabel?: string;
+  /** Colour preset, matching {@link FloatingDock}'s `theme`. @default "dark" */
+  theme?: DockTheme;
 }
+
+export type DockTheme = "dark" | "light" | "frosted";
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -25,7 +29,7 @@ const DISMISS_VELOCITY = 500;
  * A bottom sheet on narrow viewports, a centered modal from `sm` up. Used by {@link FloatingDock}
  * for its overflow menu, but works standalone for any mobile-style sheet.
  */
-export function DockDrawer({ open, onClose, title, children, closeLabel = "Close" }: DockDrawerProps) {
+export function DockDrawer({ open, onClose, title, children, closeLabel = "Close", theme }: DockDrawerProps) {
   // Portals need a DOM node, which doesn't exist during SSR — render nothing until mounted client-side.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -81,7 +85,7 @@ export function DockDrawer({ open, onClose, title, children, closeLabel = "Close
   return createPortal(
     <AnimatePresence>
       {open && (
-        <div className="rfd-overlay-wrap">
+        <div className="rfd-overlay-wrap" data-rfd-theme={theme}>
           <motion.div
             className="rfd-overlay"
             initial={{ opacity: 0 }}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { DockDrawer } from "./DockDrawer";
+import { DockDrawer, type DockTheme } from "./DockDrawer";
 import { MoreHorizontalIcon } from "./icons";
 
 export interface DockItemBase {
@@ -66,6 +66,8 @@ export interface FloatingDockProps {
   /** @default "Main" */
   ariaLabel?: string;
   className?: string;
+  /** Colour preset. Redefine the `--rfd-*` variables for anything custom. @default "dark" */
+  theme?: DockTheme;
   /** Slide the dock out of view while scrolling down and bring it back on scroll up. @default false */
   hideOnScroll?: boolean;
 }
@@ -130,6 +132,7 @@ export function FloatingDock({
   extraContent,
   ariaLabel = "Main",
   className,
+  theme,
   hideOnScroll = false,
 }: FloatingDockProps) {
   const [moreOpen, setMoreOpen] = useState(false);
@@ -143,6 +146,7 @@ export function FloatingDock({
       <nav
         aria-label={ariaLabel}
         className={["rfd-bar", hidden && !focusWithin && "rfd-bar--hidden", className].filter(Boolean).join(" ")}
+        data-rfd-theme={theme}
         onFocus={() => setFocusWithin(true)}
         onBlur={() => setFocusWithin(false)}
       >
@@ -197,7 +201,7 @@ export function FloatingDock({
       </nav>
 
       {hasMore && (
-        <DockDrawer open={moreOpen} onClose={() => setMoreOpen(false)} title={moreSheetTitle} closeLabel={closeLabel}>
+        <DockDrawer open={moreOpen} onClose={() => setMoreOpen(false)} title={moreSheetTitle} closeLabel={closeLabel} theme={theme}>
           <div className="rfd-more-grid">
             {moreItems.map((item) => {
               const { key, label, icon: Icon, badge } = item;

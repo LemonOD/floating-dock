@@ -50,6 +50,38 @@
   flex-shrink: 0;
 }
 
+/* --- Themes: set `theme` on <FloatingDock /> (the default is dark) --- */
+
+[data-rfd-theme="light"] {
+  --rfd-bg: rgba(255, 255, 255, 0.92);
+  --rfd-bg-solid: #ffffff;
+  --rfd-border: #e2e8f0;
+  --rfd-text: #0f172a;
+  --rfd-text-muted: #64748b;
+  --rfd-accent-bg: rgba(59, 130, 246, 0.12);
+  --rfd-hover: rgba(15, 23, 42, 0.05);
+  --rfd-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.15);
+}
+
+[data-rfd-theme="frosted"] {
+  --rfd-bg: rgba(255, 255, 255, 0.55);
+  --rfd-bg-solid: rgba(255, 255, 255, 0.85);
+  --rfd-border: rgba(255, 255, 255, 0.6);
+  --rfd-text: #0f172a;
+  --rfd-text-muted: #475569;
+  --rfd-accent-bg: rgba(255, 255, 255, 0.7);
+  --rfd-hover: rgba(15, 23, 42, 0.06);
+  --rfd-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+}
+[data-rfd-theme="frosted"] .rfd-track {
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+[data-rfd-theme="frosted"] .rfd-sheet {
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
 .rfd-track {
   display: flex;
   align-items: center;

@@ -154,8 +154,13 @@ describe("DockDrawer", () => {
     expect(link).toHaveFocus();
   });
 
-  it("renders a drag handle", () => {
-    render(drawer(true));
+  it("renders a drag handle and applies the theme", () => {
+    render(
+      <DockDrawer open onClose={vi.fn()} title="Menu" theme="light">
+        <p>Body</p>
+      </DockDrawer>,
+    );
     expect(document.querySelector(".rfd-handle")).not.toBeNull();
+    expect(document.querySelector('.rfd-overlay-wrap[data-rfd-theme="light"]')).not.toBeNull();
   });
 });

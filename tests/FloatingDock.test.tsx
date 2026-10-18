@@ -190,6 +190,15 @@ describe("FloatingDock", () => {
     });
   });
 
+  describe("theme", () => {
+    it("sets data-rfd-theme only when a theme is given", () => {
+      const { rerender } = render(<FloatingDock items={ITEMS} isActive={() => false} />);
+      expect(bar()).not.toHaveAttribute("data-rfd-theme");
+      rerender(<FloatingDock items={ITEMS} isActive={() => false} theme="frosted" />);
+      expect(bar()).toHaveAttribute("data-rfd-theme", "frosted");
+    });
+  });
+
   describe("hideOnScroll", () => {
     const scrollTo = (y: number) => {
       Object.defineProperty(window, "scrollY", { value: y, configurable: true });
