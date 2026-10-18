@@ -136,7 +136,22 @@
   }
 }
 
+.rfd-sheet-grab {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+  touch-action: none;
+  cursor: grab;
+}
+.rfd-handle {
+  width: 2.25rem;
+  height: 0.25rem;
+  border-radius: 9999px;
+  background: var(--rfd-border);
+}
+
 .rfd-sheet-header {
+  touch-action: none;
   display: flex;
   align-items: center;
   justify-content: space-between;

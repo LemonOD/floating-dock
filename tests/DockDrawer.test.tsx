@@ -153,4 +153,9 @@ describe("DockDrawer", () => {
     await user.tab({ shift: true });
     expect(link).toHaveFocus();
   });
+
+  it("renders a drag handle", () => {
+    render(drawer(true));
+    expect(document.querySelector(".rfd-handle")).not.toBeNull();
+  });
 });

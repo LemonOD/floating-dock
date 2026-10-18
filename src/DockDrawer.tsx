@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import { CloseIcon } from "./icons";
 
 export interface DockDrawerProps {
@@ -17,6 +17,10 @@ export interface DockDrawerProps {
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/** Drag further than this many px, or flick faster than this many px/s, to dismiss the sheet. */
+const DISMISS_OFFSET = 100;
+const DISMISS_VELOCITY = 500;
+
 /**
  * A bottom sheet on narrow viewports, a centered modal from `sm` up. Used by {@link FloatingDock}
  * for its overflow menu, but works standalone for any mobile-style sheet.
@@ -27,6 +31,7 @@ export function DockDrawer({ open, onClose, title, children, closeLabel = "Close
   useEffect(() => setMounted(true), []);
 
   const dialogRef = useRef<HTMLDivElement>(null);
+  const dragControls = useDragControls();
 
   // Move focus into the dialog on open and hand it back to whatever opened it on close.
   useEffect(() => {
@@ -94,10 +99,28 @@ export function DockDrawer({ open, onClose, title, children, closeLabel = "Close
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 300 }}
+            drag="y"
+            dragControls={dragControls}
+            dragListener={false}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > DISMISS_OFFSET || info.velocity.y > DISMISS_VELOCITY) onClose();
+            }}
           >
-            <div className="rfd-sheet-header">
+            {/* Only the handle and header start a drag, so the scrolling body keeps working. */}
+            <div className="rfd-sheet-grab" onPointerDown={(event) => dragControls.start(event)}>
+              <span className="rfd-handle" aria-hidden="true" />
+            </div>
+            <div className="rfd-sheet-header" onPointerDown={(event) => dragControls.start(event)}>
               <h2 className="rfd-sheet-title">{title}</h2>
-              <button type="button" onClick={onClose} aria-label={closeLabel} className="rfd-close-btn">
+              <button
+                type="button"
+                onClick={onClose}
+                onPointerDown={(event) => event.stopPropagation()}
+                aria-label={closeLabel}
+                className="rfd-close-btn"
+              >
                 <CloseIcon className="rfd-close-icon" />
               </button>
             </div>
