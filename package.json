@@ -47,6 +47,14 @@
     "dock",
     "bottom-sheet"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LemonOD/floating-dock.git"
+  },
+  "homepage": "https://github.com/LemonOD/floating-dock#readme",
+  "bugs": {
+    "url": "https://github.com/LemonOD/floating-dock/issues"
+  },
   "author": "Lemon Oluwatobi",
   "license": "MIT",
   "peerDependencies": {
