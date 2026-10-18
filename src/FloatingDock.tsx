@@ -79,7 +79,6 @@ export function FloatingDock({
       <nav
         aria-label={ariaLabel}
         className={["rfd-bar", className].filter(Boolean).join(" ")}
-        style={{ bottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
       >
         <div className="rfd-track">
           {items.map(({ key, href, label, icon: Icon }) => {
