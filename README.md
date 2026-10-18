@@ -80,15 +80,36 @@ you don't pass one, it falls back to a plain `<a href>`.
 | `extraContent`    | `ReactNode`                            | —              | Rendered below the overflow grid — a natural slot for a theme toggle, sign-out button, language switcher, etc. |
 | `ariaLabel`       | `string`                               | `"Main"`       | `aria-label` on the `<nav>` element.                                          |
 | `className`       | `string`                               | —              | Extra class on the `<nav>`, alongside the built-in one.                       |
+| `theme`           | `"dark" \| "light" \| "frosted"`       | `"dark"`       | Colour preset for the bar and the sheet. Override `--rfd-*` variables for anything custom. |
+| `hideOnScroll`    | `boolean`                              | `false`        | Slide the dock away when scrolling down, bring it back on scroll up (or keyboard focus). |
 
 ```ts
-interface DockItem {
+type DockItem = DockLinkItem | DockActionItem;
+
+interface DockLinkItem {
   key: string;       // React key, usually the same as href
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>; // any icon component — lucide-react, heroicons, your own SVGs
+  badge?: number | string | boolean; // 5, "99+", or true for a dot. 0/false hide it.
+}
+
+// No href: renders a <button> instead of a link — e.g. a centre "Create" button.
+interface DockActionItem {
+  key: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  onClick: () => void;
+  prominent?: boolean; // raised, accent-filled button
+  badge?: number | string | boolean;
 }
 ```
+
+### `<FloatingDockSpacer />`
+
+A fixed dock covers the bottom of your page. Render `<FloatingDockSpacer />` as the last child of
+your scrolling content to reserve exactly the dock's height (including the iOS safe area), or use
+`padding-bottom: var(--rfd-height)` yourself.
 
 ### `<DockDrawer />`
 
@@ -102,6 +123,9 @@ it's useful on its own for any mobile-style sheet (filters, a confirmation promp
 | `title`      | `string`     | —         | Heading shown in the sheet's header. |
 | `children`   | `ReactNode`  | —         | Sheet body.                          |
 | `closeLabel` | `string`     | `"Close"` | `aria-label` for the close button.   |
+| `theme`      | `"dark" \| "light" \| "frosted"` | `"dark"` | Colour preset.                       |
+
+On touch screens the sheet can be dragged down by its handle or header to dismiss it.
 
 ## Styling
 
@@ -124,6 +148,10 @@ theme, or a wrapper element for something scoped:
   --rfd-hover: rgba(0, 0, 0, 0.05);
   --rfd-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
   --rfd-radius: 9999px;                        /* fully rounded by default — set a smaller value for softer corners */
+  --rfd-max-width: 32rem;                      /* the bar is centred and never wider than this */
+  --rfd-offset: 0.75rem;                       /* gap to the screen edges (the safe area is added on top) */
+  --rfd-badge-bg: #ef4444;
+  --rfd-badge-text: #ffffff;
 }
 ```
 
@@ -132,8 +160,11 @@ All of the dock's classes are prefixed `rfd-` to avoid collisions with the rest 
 ## Accessibility
 
 - The active tab gets `aria-current="page"`.
-- The overflow sheet is a `role="dialog"` with `aria-modal="true"`, traps body scroll while open,
+- The overflow sheet is a `role="dialog"` with `aria-modal="true"`, locks body scroll while open,
   and closes on Escape.
+- Focus moves into the sheet when it opens, Tab/Shift+Tab stay inside it, and focus returns to the
+  button that opened it when it closes.
+- Count and text badges are part of the item's accessible name; dots are decorative.
 - Every interactive element is a real `<button>` or your `LinkComponent`, so it's reachable and
   operable by keyboard out of the box.
 
