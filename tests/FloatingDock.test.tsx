@@ -248,6 +248,8 @@ describe("FloatingDock", () => {
       expect(bar()).not.toHaveAttribute("data-rfd-theme");
       rerender(<FloatingDock items={ITEMS} isActive={() => false} theme="frosted" />);
       expect(bar()).toHaveAttribute("data-rfd-theme", "frosted");
+      rerender(<FloatingDock items={ITEMS} isActive={() => false} theme="liquid" />);
+      expect(bar()).toHaveAttribute("data-rfd-theme", "liquid");
     });
   });
 

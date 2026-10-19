@@ -82,6 +82,88 @@
   -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 
+/*
+ * "liquid" — iOS-style Liquid Glass. The body is almost clear so the page shows through, with a
+ * strong blur and colour boost behind it, a bright specular rim along the top edge, an inner
+ * glow, and a glass pill for the active tab. Ink flips with the system light/dark setting;
+ * redefine the --rfd-* variables to force one or the other.
+ */
+[data-rfd-theme="liquid"] {
+  --rfd-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.1) 45%, rgba(255, 255, 255, 0.22) 100%);
+  --rfd-bg-solid: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.38) 100%);
+  --rfd-border: rgba(255, 255, 255, 0.45);
+  --rfd-text: #0b1220;
+  --rfd-text-muted: rgba(15, 23, 42, 0.62);
+  --rfd-accent-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.24));
+  --rfd-hover: rgba(255, 255, 255, 0.28);
+  --rfd-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(255, 255, 255, 0.2),
+    inset 0 0 22px 2px rgba(255, 255, 255, 0.18);
+  --rfd-pill-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.85), inset 0 -1px 1px rgba(255, 255, 255, 0.25);
+}
+@media (prefers-color-scheme: dark) {
+  [data-rfd-theme="liquid"] {
+    --rfd-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 45%, rgba(255, 255, 255, 0.1) 100%);
+    --rfd-bg-solid: linear-gradient(135deg, rgba(40, 46, 60, 0.62) 0%, rgba(20, 24, 34, 0.5) 100%);
+    --rfd-border: rgba(255, 255, 255, 0.2);
+    --rfd-text: #f8fafc;
+    --rfd-text-muted: rgba(255, 255, 255, 0.7);
+    --rfd-accent-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.1));
+    --rfd-hover: rgba(255, 255, 255, 0.12);
+    --rfd-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2),
+      inset 0 1px 1px rgba(255, 255, 255, 0.4), inset 0 -1px 1px rgba(255, 255, 255, 0.08),
+      inset 0 0 22px 2px rgba(255, 255, 255, 0.06);
+    --rfd-pill-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+  }
+}
+[data-rfd-theme="liquid"] .rfd-track,
+[data-rfd-theme="liquid"] .rfd-sheet {
+  backdrop-filter: blur(12px) saturate(200%) brightness(1.06);
+  -webkit-backdrop-filter: blur(12px) saturate(200%) brightness(1.06);
+}
+[data-rfd-theme="liquid"] .rfd-sheet {
+  box-shadow: var(--rfd-shadow);
+  backdrop-filter: blur(28px) saturate(200%) brightness(1.06);
+  -webkit-backdrop-filter: blur(28px) saturate(200%) brightness(1.06);
+}
+[data-rfd-theme="liquid"] .rfd-track {
+  position: relative;
+}
+/* Soft highlight sweeping in from the top-left corner, like light catching the glass. */
+[data-rfd-theme="liquid"] .rfd-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(120% 160% at 12% -30%, rgba(255, 255, 255, 0.45), transparent 55%);
+}
+[data-rfd-theme="liquid"] .rfd-pill {
+  box-shadow: var(--rfd-pill-shadow);
+}
+/* No backdrop-filter, or the user asked for less transparency: fall back to a solid surface. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-rfd-theme="liquid"] {
+    --rfd-bg: Canvas;
+    --rfd-bg-solid: Canvas;
+    --rfd-text: CanvasText;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  [data-rfd-theme="liquid"] {
+    --rfd-bg: Canvas;
+    --rfd-bg-solid: Canvas;
+    --rfd-text: CanvasText;
+  }
+  [data-rfd-theme="liquid"] .rfd-track::before {
+    display: none;
+  }
+}
+
 .rfd-track {
   display: flex;
   align-items: center;

@@ -80,7 +80,7 @@ you don't pass one, it falls back to a plain `<a href>`.
 | `extraContent`    | `ReactNode`                            | —              | Rendered below the overflow grid — a natural slot for a theme toggle, sign-out button, language switcher, etc. |
 | `ariaLabel`       | `string`                               | `"Main"`       | `aria-label` on the `<nav>` element.                                          |
 | `className`       | `string`                               | —              | Extra class on the `<nav>`, alongside the built-in one.                       |
-| `theme`           | `"dark" \| "light" \| "frosted"`       | `"dark"`       | Colour preset for the bar and the sheet. Override `--rfd-*` variables for anything custom. |
+| `theme`           | `"dark" \| "light" \| "frosted" \| "liquid"`       | `"dark"`       | Colour preset for the bar and the sheet. Override `--rfd-*` variables for anything custom. |
 | `hideOnScroll`    | `boolean`                              | `false`        | Slide the dock away when scrolling down, bring it back on scroll up (or keyboard focus). |
 
 ```ts
@@ -126,7 +126,7 @@ it's useful on its own for any mobile-style sheet (filters, a confirmation promp
 | `title`      | `string`     | —         | Heading shown in the sheet's header. |
 | `children`   | `ReactNode`  | —         | Sheet body.                          |
 | `closeLabel` | `string`     | `"Close"` | `aria-label` for the close button.   |
-| `theme`      | `"dark" \| "light" \| "frosted"` | `"dark"` | Colour preset.                       |
+| `theme`      | `"dark" \| "light" \| "frosted" \| "liquid"` | `"dark"` | Colour preset.                       |
 
 On touch screens the sheet can be dragged down by its handle or header to dismiss it.
 
@@ -157,6 +157,14 @@ theme, or a wrapper element for something scoped:
   --rfd-badge-text: #ffffff;
 }
 ```
+
+### Liquid Glass
+
+`theme="liquid"` gives the dock and its sheet an iOS-style glass look: the page shows through a
+nearly clear, heavily blurred surface with a bright rim and a glass pill on the active tab. The ink
+switches with the system light/dark setting, and it falls back to a solid surface when
+`backdrop-filter` is unavailable or the user prefers reduced transparency. It looks best over
+content with some colour behind it — on a flat background there is nothing to refract.
 
 All of the dock's classes are prefixed `rfd-` to avoid collisions with the rest of your app's CSS.
 

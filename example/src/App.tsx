@@ -9,7 +9,7 @@ import {
   User,
   Wallet,
 } from "lucide-react";
-import { FloatingDock, type DockItem, type DockLinkProps } from "react-floating-dock";
+import { FloatingDock, FloatingDockSpacer, type DockItem, type DockLinkProps } from "react-floating-dock";
 
 const PRIMARY: DockItem[] = [
   { key: "home", href: "/home", label: "Home", icon: Home },
@@ -49,8 +49,16 @@ export function App() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <header style={{ padding: "1.5rem 1.25rem 7rem", maxWidth: 420, margin: "0 auto", width: "100%" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        background:
+          "radial-gradient(circle at 15% 10%, #f97316 0, transparent 35%), radial-gradient(circle at 85% 30%, #8b5cf6 0, transparent 40%), radial-gradient(circle at 30% 80%, #06b6d4 0, transparent 40%), #0f172a",
+      }}
+    >
+      <header style={{ padding: "1.5rem 1.25rem 1rem", maxWidth: 420, margin: "0 auto", width: "100%" }}>
         <h1 style={{ fontSize: "1.25rem", fontWeight: 700 }}>react-floating-dock</h1>
         <p style={{ color: "#94a3b8", fontSize: "0.9rem" }}>
           Current page: <strong style={{ color: "#3b82f6" }}>{path}</strong>
@@ -62,11 +70,27 @@ export function App() {
         </p>
       </header>
 
+      <main style={{ padding: "0 1.25rem", maxWidth: 420, margin: "0 auto", width: "100%" }}>
+        {Array.from({ length: 8 }, (_, i) => (
+          <div
+            key={i}
+            style={{
+              height: 110,
+              borderRadius: 16,
+              marginBottom: 12,
+              background: `hsl(${i * 45} 80% 55% / 0.85)`,
+            }}
+          />
+        ))}
+      </main>
+      <FloatingDockSpacer />
+
       <FloatingDock
         items={PRIMARY}
         moreItems={MORE}
         isActive={(href) => href === path}
         LinkComponent={FakeLink}
+        theme="liquid"
         extraContent={
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem", marginTop: "1rem" }}>
             <button className="rfd-more-item" type="button">

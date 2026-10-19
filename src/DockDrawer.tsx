@@ -16,7 +16,7 @@ export interface DockDrawerProps {
   theme?: DockTheme;
 }
 
-export type DockTheme = "dark" | "light" | "frosted";
+export type DockTheme = "dark" | "light" | "frosted" | "liquid";
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
