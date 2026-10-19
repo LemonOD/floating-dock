@@ -152,7 +152,7 @@ theme, or a wrapper element for something scoped:
   --rfd-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
   --rfd-radius: 9999px;                        /* fully rounded by default — set a smaller value for softer corners */
   --rfd-max-width: 32rem;                      /* the bar is centred and never wider than this */
-  --rfd-tab-height: 52px;                      /* height of each tab; the bar adds 14px of padding and border */
+  --rfd-bar-height: 52px;                      /* total height of the bar (tabs are this minus its padding and border) */
   --rfd-offset: 0.75rem;                       /* gap to the screen edges (the safe area is added on top) */
   --rfd-badge-bg: #ef4444;
   --rfd-badge-text: #ffffff;
