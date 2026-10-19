@@ -204,6 +204,10 @@
 .rfd-pill {
   position: absolute;
   inset: 0;
+  margin: auto;
+  /* Square, so the pill is a circle (or a rounded square if --rfd-radius is small) centred in the tab. */
+  width: min(100%, var(--rfd-tab-height));
+  height: var(--rfd-tab-height);
   border-radius: var(--rfd-radius);
   background: var(--rfd-accent-bg);
 }
