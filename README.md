@@ -94,6 +94,9 @@ interface DockLinkItem {
   badge?: number | string | boolean; // 5, "99+", or true for a dot. 0/false hide it.
 }
 
+// If any moreItem carries a badge, the "More" button itself gets a plain attention dot — so
+// something needing attention is never hidden from view just because it's tucked in the overflow.
+
 // No href: renders a <button> instead of a link — e.g. a centre "Create" button.
 interface DockActionItem {
   key: string;

@@ -19,7 +19,7 @@ const PRIMARY: DockItem[] = [
 ];
 
 const MORE: DockItem[] = [
-  { key: "profile", href: "/profile", label: "Profile", icon: User },
+  { key: "profile", href: "/profile", label: "Profile", icon: User, badge: 2 },
   { key: "password", href: "/password", label: "Password", icon: KeyRound },
 ];
 

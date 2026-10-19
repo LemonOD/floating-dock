@@ -45,7 +45,11 @@ export interface DockLinkProps {
 export interface FloatingDockProps {
   /** Destinations shown directly in the bar. Four or five is the sweet spot. */
   items: DockItem[];
-  /** Extra destinations shown in the overflow sheet when the "More" button is pressed. */
+  /**
+   * Extra destinations shown in the overflow sheet when the "More" button is pressed. If any of
+   * them carries a `badge`, the "More" button itself gets a plain attention dot — so something
+   * needing attention is never hidden from view just because it's tucked in the overflow.
+   */
   moreItems?: DockItem[];
   /** Tells the dock which item (if any) is the current page. */
   isActive: (href: string) => boolean;
@@ -138,6 +142,8 @@ export function FloatingDock({
   const [moreOpen, setMoreOpen] = useState(false);
   const hasMore = moreItems.length > 0;
   const moreActive = hasMore && moreItems.some((item) => item.href !== undefined && isActive(item.href));
+  // A plain dot, not a count: the point is "something in here needs attention", not how much.
+  const moreHasBadge = hasMore && moreItems.some((item) => !!item.badge);
   const hidden = useHiddenOnScroll(hideOnScroll);
   const [focusWithin, setFocusWithin] = useState(false);
 
@@ -195,6 +201,7 @@ export function FloatingDock({
               {moreActive && <span className="rfd-pill" />}
               <MoreHorizontalIcon className={moreActive ? "rfd-icon rfd-icon--active" : "rfd-icon"} />
               <span className={moreActive ? "rfd-label rfd-label--active" : "rfd-label"}>{moreLabel}</span>
+              <Badge value={moreHasBadge} />
             </button>
           )}
         </div>

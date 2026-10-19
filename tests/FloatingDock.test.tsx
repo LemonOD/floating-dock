@@ -154,6 +154,58 @@ describe("FloatingDock", () => {
       expect(bar().querySelectorAll(".rfd-badge")).toHaveLength(1);
       expect(bar().querySelector(".rfd-badge--dot")).not.toBeNull();
     });
+
+    it("puts a plain dot on the More button when a moreItem carries a badge", () => {
+      render(
+        <FloatingDock
+          items={ITEMS}
+          moreItems={[{ ...MORE_ITEMS[0]!, badge: 3 }, MORE_ITEMS[1]!]}
+          isActive={() => false}
+        />,
+      );
+      const moreButton = within(bar()).getByRole("button", { name: "More" });
+      expect(moreButton.querySelector(".rfd-badge--dot")).not.toBeNull();
+      // A dot, not the count itself — the button's accessible name stays plain "More".
+      expect(moreButton).toHaveAccessibleName("More");
+    });
+
+    it("does not put a dot on More when no moreItem has a badge", () => {
+      render(<FloatingDock items={ITEMS} moreItems={MORE_ITEMS} isActive={() => false} />);
+      const moreButton = within(bar()).getByRole("button", { name: "More" });
+      expect(moreButton.querySelector(".rfd-badge")).toBeNull();
+    });
+
+    it("does not put a dot on More when there are no moreItems at all", () => {
+      render(<FloatingDock items={ITEMS} isActive={() => false} />);
+      expect(bar().querySelector(".rfd-badge")).toBeNull();
+    });
+
+    it("ignores falsy badges (0, false) on moreItems when deciding whether to show the dot", () => {
+      render(
+        <FloatingDock
+          items={ITEMS}
+          moreItems={[
+            { ...MORE_ITEMS[0]!, badge: 0 },
+            { ...MORE_ITEMS[1]!, badge: false },
+          ]}
+          isActive={() => false}
+        />,
+      );
+      const moreButton = within(bar()).getByRole("button", { name: "More" });
+      expect(moreButton.querySelector(".rfd-badge")).toBeNull();
+    });
+
+    it("still shows the dot on More even when a primary item also has its own badge", () => {
+      render(
+        <FloatingDock
+          items={[{ ...ITEMS[0]!, badge: 2 }, ITEMS[1]!]}
+          moreItems={[{ ...MORE_ITEMS[0]!, badge: true }, MORE_ITEMS[1]!]}
+          isActive={() => false}
+        />,
+      );
+      const moreButton = within(bar()).getByRole("button", { name: "More" });
+      expect(moreButton.querySelector(".rfd-badge--dot")).not.toBeNull();
+    });
   });
 
   describe("action items", () => {
