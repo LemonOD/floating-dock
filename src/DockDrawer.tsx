@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion, useDragControls } from "framer-motion";
+import { AnimatePresence, motion, useDragControls, useReducedMotion } from "framer-motion";
 import { CloseIcon } from "./icons";
 
 export interface DockDrawerProps {
@@ -36,6 +36,7 @@ export function DockDrawer({ open, onClose, title, children, closeLabel = "Close
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
+  const reducedMotion = useReducedMotion();
 
   // Move focus into the dialog on open and hand it back to whatever opened it on close.
   useEffect(() => {
@@ -102,7 +103,7 @@ export function DockDrawer({ open, onClose, title, children, closeLabel = "Close
             initial={{ y: "120%" }}
             animate={{ y: 0 }}
             exit={{ y: "120%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 300 }}
+            transition={reducedMotion ? { duration: 0 } : { type: "spring", damping: 28, stiffness: 300 }}
             drag="y"
             dragControls={dragControls}
             dragListener={false}

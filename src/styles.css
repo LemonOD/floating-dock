@@ -10,6 +10,8 @@
   --rfd-text: #e2e8f0;
   --rfd-text-muted: #94a3b8;
   --rfd-accent: #3b82f6;
+  /* Accent for text and icons on the bar; lighter/darker per theme so it stays above 4.5:1 contrast. */
+  --rfd-accent-text: #93c5fd;
   --rfd-accent-bg: rgba(59, 130, 246, 0.15);
   --rfd-accent-contrast: #ffffff;
   --rfd-hover: rgba(255, 255, 255, 0.06);
@@ -19,7 +21,7 @@
   --rfd-offset: 0.75rem;
   --rfd-bar-height: 52px;
   --rfd-tab-height: calc(var(--rfd-bar-height) - 0.75rem - 2px);
-  --rfd-badge-bg: #ef4444;
+  --rfd-badge-bg: #dc2626;
   --rfd-badge-text: #ffffff;
   /* Height the dock occupies from the bottom of the viewport; <FloatingDockSpacer /> uses it. */
   --rfd-height: calc(var(--rfd-bar-height) + 1rem + var(--rfd-offset) * 2 + env(safe-area-inset-bottom, 0px));
@@ -59,18 +61,20 @@
   --rfd-bg-solid: #ffffff;
   --rfd-border: #e2e8f0;
   --rfd-text: #0f172a;
-  --rfd-text-muted: #64748b;
+  --rfd-text-muted: #475569;
+  --rfd-accent-text: #1d4ed8;
   --rfd-accent-bg: rgba(59, 130, 246, 0.12);
   --rfd-hover: rgba(15, 23, 42, 0.05);
   --rfd-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.15);
 }
 
 [data-rfd-theme="frosted"] {
-  --rfd-bg: rgba(255, 255, 255, 0.55);
-  --rfd-bg-solid: rgba(255, 255, 255, 0.85);
+  --rfd-bg: rgba(255, 255, 255, 0.85);
+  --rfd-bg-solid: rgba(255, 255, 255, 0.92);
   --rfd-border: rgba(255, 255, 255, 0.6);
   --rfd-text: #0f172a;
-  --rfd-text-muted: #475569;
+  --rfd-text-muted: #334155;
+  --rfd-accent-text: #1d4ed8;
   --rfd-accent-bg: rgba(255, 255, 255, 0.7);
   --rfd-hover: rgba(15, 23, 42, 0.06);
   --rfd-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
@@ -91,12 +95,13 @@
  * redefine the --rfd-* variables to force one or the other.
  */
 [data-rfd-theme="liquid"] {
-  --rfd-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.1) 45%, rgba(255, 255, 255, 0.22) 100%);
-  --rfd-bg-solid: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.38) 100%);
-  --rfd-border: rgba(255, 255, 255, 0.45);
+  --rfd-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.6) 45%, rgba(255, 255, 255, 0.7) 100%);
+  --rfd-bg-solid: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.72) 100%);
+  --rfd-border: rgba(255, 255, 255, 0.55);
   --rfd-text: #0b1220;
-  --rfd-text-muted: rgba(15, 23, 42, 0.62);
-  --rfd-accent-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.24));
+  --rfd-text-muted: #1e293b;
+  --rfd-accent-text: #0b1220;
+  --rfd-accent-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.55));
   --rfd-hover: rgba(255, 255, 255, 0.28);
   --rfd-shadow:
     0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08),
@@ -107,12 +112,13 @@
 }
 @media (prefers-color-scheme: dark) {
   [data-rfd-theme="liquid"] {
-    --rfd-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 45%, rgba(255, 255, 255, 0.1) 100%);
-    --rfd-bg-solid: linear-gradient(135deg, rgba(40, 46, 60, 0.62) 0%, rgba(20, 24, 34, 0.5) 100%);
+    --rfd-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.78) 0%, rgba(15, 23, 42, 0.72) 45%, rgba(30, 41, 59, 0.76) 100%);
+    --rfd-bg-solid: linear-gradient(135deg, rgba(30, 41, 59, 0.84) 0%, rgba(15, 23, 42, 0.78) 100%);
     --rfd-border: rgba(255, 255, 255, 0.2);
     --rfd-text: #f8fafc;
-    --rfd-text-muted: rgba(255, 255, 255, 0.7);
-    --rfd-accent-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.1));
+    --rfd-text-muted: #e2e8f0;
+    --rfd-accent-text: #f8fafc;
+    --rfd-accent-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
     --rfd-hover: rgba(255, 255, 255, 0.12);
     --rfd-shadow:
       0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2),
@@ -120,6 +126,9 @@
       inset 0 0 22px 2px rgba(255, 255, 255, 0.06);
     --rfd-pill-shadow:
       0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+  }
+  [data-rfd-theme="liquid"] .rfd-track::before {
+    opacity: 0.4;
   }
 }
 [data-rfd-theme="liquid"] .rfd-track,
@@ -231,6 +240,15 @@
   background: var(--rfd-accent-bg);
 }
 
+/* --- Keyboard focus: visible in every theme (override with --rfd-focus) --- */
+
+.rfd-tab:focus-visible,
+.rfd-close-btn:focus-visible,
+.rfd-more-item:focus-visible {
+  outline: 2px solid var(--rfd-focus, var(--rfd-accent-text));
+  outline-offset: 2px;
+}
+
 /* --- Badges and action buttons --- */
 
 .rfd-badge {
@@ -299,7 +317,7 @@
   flex-shrink: 0;
 }
 .rfd-icon--active {
-  color: var(--rfd-accent);
+  color: var(--rfd-accent-text);
 }
 
 .rfd-label {
@@ -311,7 +329,7 @@
   white-space: nowrap;
 }
 .rfd-label--active {
-  color: var(--rfd-accent);
+  color: var(--rfd-accent-text);
 }
 
 /* --- Overflow sheet --- */

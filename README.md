@@ -145,7 +145,8 @@ theme, or a wrapper element for something scoped:
   --rfd-border: #e2e8f0;
   --rfd-text: #0f172a;
   --rfd-text-muted: #64748b;
-  --rfd-accent: #3b82f6;                      /* active tab color */
+  --rfd-accent: #3b82f6;                      /* fills: the raised centre button, the active circle in the sheet */
+  --rfd-accent-text: #1d4ed8;                 /* active tab text and icon — keep it at 4.5:1 against --rfd-bg */
   --rfd-accent-bg: rgba(59, 130, 246, 0.12);   /* active tab's pill background */
   --rfd-accent-contrast: #ffffff;              /* text/icon color on top of --rfd-accent */
   --rfd-hover: rgba(0, 0, 0, 0.05);
@@ -176,6 +177,13 @@ All of the dock's classes are prefixed `rfd-` to avoid collisions with the rest 
   and closes on Escape.
 - Focus moves into the sheet when it opens, Tab/Shift+Tab stay inside it, and focus returns to the
   button that opened it when it closes.
+- Every theme keeps ink, muted ink and the active tab at 4.5:1 contrast or better, even over a pure
+  black or white page (checked for each theme and for both of `liquid`'s light and dark variants).
+  The glass themes pay for that with a tint floor, so they are blurred and translucent rather than
+  fully clear; redefine `--rfd-bg` if you want clearer glass and can vouch for the content behind it.
+- Keyboard focus shows a 2px ring on tabs, the close button and sheet items in every theme
+  (`--rfd-focus` to recolour it). Motion — the pill's travel and stretch, the sheet's slide — is
+  turned off under `prefers-reduced-motion`.
 - Count and text badges are part of the item's accessible name; dots are decorative.
 - Every interactive element is a real `<button>` or your `LinkComponent`, so it's reachable and
   operable by keyboard out of the box.
