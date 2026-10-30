@@ -163,10 +163,10 @@ theme, or a wrapper element for something scoped:
 ### Liquid Glass
 
 `theme="liquid"` gives the dock and its sheet an iOS-style glass look: the page shows through a
-nearly clear, heavily blurred surface with a bright rim and a glass pill on the active tab. The ink
-switches with the system light/dark setting, and it falls back to a solid surface when
-`backdrop-filter` is unavailable or the user prefers reduced transparency. It looks best over
-content with some colour behind it — on a flat background there is nothing to refract.
+clear, blurred bar with a bright rim, an inner glow, and a glass pill on the active tab. The ink
+switches with the system light/dark setting. It looks best over content with some colour behind it —
+on a flat background there is nothing to show through. For a clearer or smokier bar, change
+`--rfd-glass` (the backdrop-filter) and the tint in `--rfd-bg`.
 
 All of the dock's classes are prefixed `rfd-` to avoid collisions with the rest of your app's CSS.
 
@@ -177,10 +177,12 @@ All of the dock's classes are prefixed `rfd-` to avoid collisions with the rest 
   and closes on Escape.
 - Focus moves into the sheet when it opens, Tab/Shift+Tab stay inside it, and focus returns to the
   button that opened it when it closes.
-- Every theme keeps ink, muted ink and the active tab at 4.5:1 contrast or better, even over a pure
-  black or white page (checked for each theme and for both of `liquid`'s light and dark variants).
-  The glass themes pay for that with a tint floor, so they are blurred and translucent rather than
-  fully clear; redefine `--rfd-bg` if you want clearer glass and can vouch for the content behind it.
+- Every theme keeps ink, muted ink and the active tab at 4.5:1 contrast or better. The glass themes
+  (`frosted`, `liquid`) stay see-through and get there by squeezing the contrast and shifting the
+  brightness of whatever is behind the bar (via `--rfd-glass`), with the active pill as a denser
+  chip on top. Calculated for black, white, grey, saturated colours, orange, navy and sky blue
+  behind the bar — not for every possible photo, so check it over your own content. They fall back
+  to an opaque system surface under `prefers-reduced-transparency` or without `backdrop-filter`.
 - Keyboard focus shows a 2px ring on tabs, the close button and sheet items in every theme
   (`--rfd-focus` to recolour it). Motion — the pill's travel and stretch, the sheet's slide — is
   turned off under `prefers-reduced-motion`.

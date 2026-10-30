@@ -68,40 +68,42 @@
   --rfd-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.15);
 }
 
+/*
+ * The two glass themes keep the bar properly see-through (like WhatsApp's) and get their
+ * legibility from the backdrop-filter instead of from an opaque tint: `contrast()` squeezes whatever
+ * is behind the bar toward the middle of the range and `brightness()` shifts it toward the ink's
+ * opposite, so even a pure black or white page behind a light/dark glass bar leaves 4.5:1 between
+ * the ink and the surface. The active pill is a denser chip on top of that. Checked against black,
+ * white, grey, the six saturated primaries/secondaries, orange, navy and sky blue.
+ */
 [data-rfd-theme="frosted"] {
-  --rfd-bg: rgba(255, 255, 255, 0.85);
-  --rfd-bg-solid: rgba(255, 255, 255, 0.92);
+  --rfd-bg: rgba(255, 255, 255, 0.35);
+  --rfd-bg-solid: rgba(255, 255, 255, 0.5);
   --rfd-border: rgba(255, 255, 255, 0.6);
   --rfd-text: #0f172a;
-  --rfd-text-muted: #334155;
-  --rfd-accent-text: #1d4ed8;
+  --rfd-text-muted: #1e293b;
+  --rfd-accent-text: #1e40af;
   --rfd-accent-bg: rgba(255, 255, 255, 0.7);
   --rfd-hover: rgba(15, 23, 42, 0.06);
   --rfd-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
-}
-[data-rfd-theme="frosted"] .rfd-track {
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-}
-[data-rfd-theme="frosted"] .rfd-sheet {
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  --rfd-glass: blur(24px) saturate(160%) contrast(0.4) brightness(1.4);
+  --rfd-halo: rgba(255, 255, 255, 0.55);
 }
 
 /*
- * "liquid" — iOS-style Liquid Glass. The body is almost clear so the page shows through, with a
- * strong blur and colour boost behind it, a bright specular rim along the top edge, an inner
- * glow, and a glass pill for the active tab. Ink flips with the system light/dark setting;
- * redefine the --rfd-* variables to force one or the other.
+ * "liquid" — iOS-style Liquid Glass: the page shows through a clear, blurred surface with a bright
+ * specular rim along the top edge, an inner glow, a highlight sweeping in from the corner, and a
+ * glass pill under the active tab. Ink flips with the system light/dark setting; redefine the
+ * --rfd-* variables to force one or the other.
  */
 [data-rfd-theme="liquid"] {
-  --rfd-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.6) 45%, rgba(255, 255, 255, 0.7) 100%);
-  --rfd-bg-solid: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.72) 100%);
+  --rfd-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.25) 45%, rgba(255, 255, 255, 0.3) 100%);
+  --rfd-bg-solid: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.42) 100%);
   --rfd-border: rgba(255, 255, 255, 0.55);
   --rfd-text: #0b1220;
   --rfd-text-muted: #1e293b;
-  --rfd-accent-text: #0b1220;
-  --rfd-accent-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.55));
+  --rfd-accent-text: #1e40af;
+  --rfd-accent-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.6));
   --rfd-hover: rgba(255, 255, 255, 0.28);
   --rfd-shadow:
     0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08),
@@ -109,16 +111,18 @@
     inset 0 0 22px 2px rgba(255, 255, 255, 0.18);
   --rfd-pill-shadow:
     0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.85), inset 0 -1px 1px rgba(255, 255, 255, 0.25);
+  --rfd-glass: blur(12px) saturate(160%) contrast(0.4) brightness(1.4);
+  --rfd-halo: rgba(255, 255, 255, 0.55);
 }
 @media (prefers-color-scheme: dark) {
   [data-rfd-theme="liquid"] {
-    --rfd-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.78) 0%, rgba(15, 23, 42, 0.72) 45%, rgba(30, 41, 59, 0.76) 100%);
-    --rfd-bg-solid: linear-gradient(135deg, rgba(30, 41, 59, 0.84) 0%, rgba(15, 23, 42, 0.78) 100%);
-    --rfd-border: rgba(255, 255, 255, 0.2);
+    --rfd-bg: linear-gradient(135deg, rgba(15, 23, 42, 0.3) 0%, rgba(15, 23, 42, 0.25) 45%, rgba(15, 23, 42, 0.28) 100%);
+    --rfd-bg-solid: linear-gradient(135deg, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.4) 100%);
+    --rfd-border: rgba(255, 255, 255, 0.22);
     --rfd-text: #f8fafc;
     --rfd-text-muted: #e2e8f0;
     --rfd-accent-text: #f8fafc;
-    --rfd-accent-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+    --rfd-accent-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
     --rfd-hover: rgba(255, 255, 255, 0.12);
     --rfd-shadow:
       0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2),
@@ -126,20 +130,31 @@
       inset 0 0 22px 2px rgba(255, 255, 255, 0.06);
     --rfd-pill-shadow:
       0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+    --rfd-glass: blur(12px) saturate(160%) contrast(0.4) brightness(0.5);
+    --rfd-halo: rgba(0, 0, 0, 0.45);
   }
   [data-rfd-theme="liquid"] .rfd-track::before {
-    opacity: 0.4;
+    opacity: 0.22;
   }
 }
+[data-rfd-theme="frosted"] .rfd-track,
 [data-rfd-theme="liquid"] .rfd-track,
+[data-rfd-theme="frosted"] .rfd-sheet,
 [data-rfd-theme="liquid"] .rfd-sheet {
-  backdrop-filter: blur(12px) saturate(200%) brightness(1.06);
-  -webkit-backdrop-filter: blur(12px) saturate(200%) brightness(1.06);
+  backdrop-filter: var(--rfd-glass);
+  -webkit-backdrop-filter: var(--rfd-glass);
 }
 [data-rfd-theme="liquid"] .rfd-sheet {
   box-shadow: var(--rfd-shadow);
-  backdrop-filter: blur(28px) saturate(200%) brightness(1.06);
-  -webkit-backdrop-filter: blur(28px) saturate(200%) brightness(1.06);
+}
+/* A soft halo in the opposite tone keeps glyphs readable over busy photos as well as flat colour. */
+[data-rfd-theme="frosted"] .rfd-label,
+[data-rfd-theme="liquid"] .rfd-label {
+  text-shadow: 0 0 6px var(--rfd-halo);
+}
+[data-rfd-theme="frosted"] .rfd-icon,
+[data-rfd-theme="liquid"] .rfd-icon {
+  filter: drop-shadow(0 0 3px var(--rfd-halo));
 }
 /* Soft highlight sweeping in from the top-left corner, like light catching the glass. */
 [data-rfd-theme="liquid"] .rfd-track::before {
@@ -153,25 +168,35 @@
 [data-rfd-theme="liquid"] .rfd-pill {
   box-shadow: var(--rfd-pill-shadow);
 }
-/* No backdrop-filter, or the user asked for less transparency: fall back to a solid surface. */
+/* No backdrop-filter, or the user asked for less transparency: fall back to an opaque system surface. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-rfd-theme="frosted"],
   [data-rfd-theme="liquid"] {
     --rfd-bg: Canvas;
     --rfd-bg-solid: Canvas;
     --rfd-text: CanvasText;
+    --rfd-text-muted: color-mix(in srgb, CanvasText 80%, Canvas);
+    --rfd-accent-text: CanvasText;
+    --rfd-accent-bg: color-mix(in srgb, CanvasText 16%, transparent);
+    --rfd-halo: transparent;
   }
 }
 @media (prefers-reduced-transparency: reduce) {
+  [data-rfd-theme="frosted"],
   [data-rfd-theme="liquid"] {
     --rfd-bg: Canvas;
     --rfd-bg-solid: Canvas;
     --rfd-text: CanvasText;
+    --rfd-text-muted: color-mix(in srgb, CanvasText 80%, Canvas);
+    --rfd-accent-text: CanvasText;
+    --rfd-accent-bg: color-mix(in srgb, CanvasText 16%, transparent);
+    --rfd-halo: transparent;
+    --rfd-glass: none;
   }
   [data-rfd-theme="liquid"] .rfd-track::before {
     display: none;
   }
 }
-
 .rfd-track {
   position: relative;
   display: flex;
