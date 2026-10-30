@@ -72,7 +72,7 @@ export interface FloatingDockProps {
   className?: string;
   /** Colour preset. Redefine the `--rfd-*` variables for anything custom. @default "dark" */
   theme?: DockTheme;
-  /** Slide the dock out of view while scrolling down and bring it back on scroll up. @default false */
+  /** Slide the dock out of view while scrolling down and bring it back on scroll up. @default true */
   hideOnScroll?: boolean;
 }
 
@@ -157,7 +157,7 @@ export function FloatingDock({
   ariaLabel = "Main",
   className,
   theme,
-  hideOnScroll = false,
+  hideOnScroll = true,
 }: FloatingDockProps) {
   const [moreOpen, setMoreOpen] = useState(false);
   const hasMore = moreItems.length > 0;

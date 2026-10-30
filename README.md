@@ -81,7 +81,7 @@ you don't pass one, it falls back to a plain `<a href>`.
 | `ariaLabel`       | `string`                               | `"Main"`       | `aria-label` on the `<nav>` element.                                          |
 | `className`       | `string`                               | —              | Extra class on the `<nav>`, alongside the built-in one.                       |
 | `theme`           | `"dark" \| "light" \| "frosted" \| "liquid"`       | `"dark"`       | Colour preset for the bar and the sheet. Override `--rfd-*` variables for anything custom. |
-| `hideOnScroll`    | `boolean`                              | `false`        | Slide the dock away when scrolling down, bring it back on scroll up (or keyboard focus). |
+| `hideOnScroll`    | `boolean`                              | `true`         | Slide the dock away when scrolling down, bring it back on scroll up (or keyboard focus). Pass `false` to keep it fixed. |
 
 ```ts
 type DockItem = DockLinkItem | DockActionItem;

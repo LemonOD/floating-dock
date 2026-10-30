@@ -286,7 +286,7 @@ describe("FloatingDock", () => {
     afterEach(() => scrollTo(0));
 
     it("hides on scroll down and returns on scroll up", () => {
-      render(<FloatingDock items={ITEMS} isActive={() => false} hideOnScroll />);
+      render(<FloatingDock items={ITEMS} isActive={() => false} />);
       scrollTo(200);
       expect(bar()).toHaveClass("rfd-bar--hidden");
       scrollTo(150);
@@ -294,7 +294,7 @@ describe("FloatingDock", () => {
     });
 
     it("never hides when the option is off", () => {
-      render(<FloatingDock items={ITEMS} isActive={() => false} />);
+      render(<FloatingDock items={ITEMS} isActive={() => false} hideOnScroll={false} />);
       scrollTo(400);
       expect(bar()).not.toHaveClass("rfd-bar--hidden");
     });
