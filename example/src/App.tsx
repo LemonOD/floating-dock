@@ -44,6 +44,8 @@ function FakeLink({ href, children, className, onClick, ...rest }: DockLinkProps
 export function App() {
   const [path, setPath] = useState("/home");
 
+  const [custom, setCustom] = useState(false);
+
   useState(() => {
     window.addEventListener("fake-navigate", (e) => setPath((e as CustomEvent).detail));
   });
@@ -63,6 +65,13 @@ export function App() {
         <p style={{ color: "#94a3b8", fontSize: "0.9rem" }}>
           Current page: <strong style={{ color: "#3b82f6" }}>{path}</strong>
         </p>
+        <button
+          type="button"
+          onClick={() => setCustom((c) => !c)}
+          style={{ margin: "0.5rem 0", padding: "0.4rem 0.8rem", borderRadius: 8, border: "1px solid #475569", background: "transparent", color: "inherit" }}
+        >
+          More content: {custom ? "custom children" : "default grid"}
+        </button>
         <p style={{ color: "#94a3b8", fontSize: "0.85rem", lineHeight: 1.5 }}>
           Tap a tab below, or open &quot;More&quot; for the overflow sheet. This mimics a router by
           swapping a bit of local state — a real app passes its own Link component instead of{" "}
@@ -91,6 +100,30 @@ export function App() {
         isActive={(href) => href === path}
         LinkComponent={FakeLink}
         theme="liquid"
+        moreActive={custom ? path === "/profile" || path === "/password" : undefined}
+        {...(custom
+          ? {
+              showMoreSheetTitle: false,
+              children: ({ close }: { close: () => void }) => (
+                <div style={{ display: "grid", gap: 4 }}>
+                  {MORE.map(({ key, href, label }) => (
+                    <button
+                      key={key}
+                      type="button"
+                      className="rfd-more-item"
+                      style={{ flexDirection: "row", gap: 12, padding: "12px 8px", textAlign: "left" }}
+                      onClick={() => {
+                        window.dispatchEvent(new CustomEvent("fake-navigate", { detail: href }));
+                        close();
+                      }}
+                    >
+                      <span className="rfd-more-label">{label}</span>
+                    </button>
+                  ))}
+                </div>
+              ),
+            }
+          : {})}
         extraContent={
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem", marginTop: "1rem" }}>
             <button className="rfd-more-item" type="button">

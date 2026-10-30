@@ -65,6 +65,23 @@ export interface FloatingDockProps {
   moreSheetTitle?: string;
   /** Passed through to the overflow sheet's close button. @default "Close" */
   closeLabel?: string;
+  /**
+   * Your own design for the overflow sheet. Pass nodes, or a function that receives `close` so your
+   * rows can dismiss the sheet when tapped. With no children the sheet shows `moreItems` as the
+   * default grid. `extraContent` still renders below either one.
+   */
+  children?: ReactNode | ((helpers: { close: () => void }) => ReactNode);
+  /**
+   * Highlight the "More" button as the current page. By default it is lit when one of `moreItems`
+   * is active; set it yourself when the sheet holds custom `children`.
+   */
+  moreActive?: boolean;
+  /**
+   * Show the sheet's title row and close button. The title still labels the dialog for assistive
+   * tech when hidden; the sheet can be dismissed by dragging it, tapping outside, or Escape.
+   * @default true
+   */
+  showMoreSheetTitle?: boolean;
   /** Rendered at the bottom of the overflow sheet — a natural slot for a theme toggle, sign-out, etc. */
   extraContent?: ReactNode;
   /** @default "Main" */
@@ -154,14 +171,18 @@ export function FloatingDock({
   moreSheetTitle = "Menu",
   closeLabel = "Close",
   extraContent,
+  children,
+  moreActive: moreActiveProp,
+  showMoreSheetTitle = true,
   ariaLabel = "Main",
   className,
   theme,
   hideOnScroll = true,
 }: FloatingDockProps) {
   const [moreOpen, setMoreOpen] = useState(false);
-  const hasMore = moreItems.length > 0;
-  const moreActive = hasMore && moreItems.some((item) => item.href !== undefined && isActive(item.href));
+  const hasCustomMore = children !== undefined && children !== null && children !== false;
+  const hasMore = moreItems.length > 0 || hasCustomMore;
+  const moreActive = hasMore && (moreActiveProp ?? moreItems.some((item) => item.href !== undefined && isActive(item.href)));
   // A plain dot, not a count: the point is "something in here needs attention", not how much.
   const moreHasBadge = hasMore && moreItems.some((item) => !!item.badge);
   const hidden = useHiddenOnScroll(hideOnScroll);
@@ -304,41 +325,49 @@ export function FloatingDock({
       </nav>
 
       {hasMore && (
-        <DockDrawer open={moreOpen} onClose={() => setMoreOpen(false)} title={moreSheetTitle} closeLabel={closeLabel} theme={theme}>
-          <div className="rfd-more-grid">
-            {moreItems.map((item) => {
-              const { key, label, icon: Icon, badge } = item;
-              const active = item.href !== undefined && isActive(item.href);
-              const circle = (
-                <span className={active ? "rfd-more-icon-circle rfd-more-icon-circle--active" : "rfd-more-icon-circle"}>
-                  <Icon className="rfd-more-icon" />
-                  <Badge value={badge} />
-                </span>
-              );
-              if (item.href === undefined) {
+        <DockDrawer open={moreOpen} onClose={() => setMoreOpen(false)} title={moreSheetTitle} closeLabel={closeLabel} theme={theme} showHeader={showMoreSheetTitle}>
+          {hasCustomMore ? (
+            typeof children === "function" ? (
+              children({ close: () => setMoreOpen(false) })
+            ) : (
+              children
+            )
+          ) : (
+            <div className="rfd-more-grid">
+              {moreItems.map((item) => {
+                const { key, label, icon: Icon, badge } = item;
+                const active = item.href !== undefined && isActive(item.href);
+                const circle = (
+                  <span className={active ? "rfd-more-icon-circle rfd-more-icon-circle--active" : "rfd-more-icon-circle"}>
+                    <Icon className="rfd-more-icon" />
+                    <Badge value={badge} />
+                  </span>
+                );
+                if (item.href === undefined) {
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      className="rfd-more-item"
+                      onClick={() => {
+                        setMoreOpen(false);
+                        item.onClick();
+                      }}
+                    >
+                      {circle}
+                      <span className="rfd-more-label">{label}</span>
+                    </button>
+                  );
+                }
                 return (
-                  <button
-                    key={key}
-                    type="button"
-                    className="rfd-more-item"
-                    onClick={() => {
-                      setMoreOpen(false);
-                      item.onClick();
-                    }}
-                  >
+                  <LinkComponent key={key} href={item.href} className="rfd-more-item" onClick={() => setMoreOpen(false)}>
                     {circle}
                     <span className="rfd-more-label">{label}</span>
-                  </button>
+                  </LinkComponent>
                 );
-              }
-              return (
-                <LinkComponent key={key} href={item.href} className="rfd-more-item" onClick={() => setMoreOpen(false)}>
-                  {circle}
-                  <span className="rfd-more-label">{label}</span>
-                </LinkComponent>
-              );
-            })}
-          </div>
+              })}
+            </div>
+          )}
           {extraContent}
         </DockDrawer>
       )}

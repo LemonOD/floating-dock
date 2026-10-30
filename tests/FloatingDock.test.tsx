@@ -276,6 +276,54 @@ describe("FloatingDock", () => {
     });
   });
 
+  describe("custom overflow content", () => {
+    it("shows the default grid when no children are given", async () => {
+      const user = userEvent.setup();
+      render(<FloatingDock items={ITEMS} moreItems={MORE_ITEMS} isActive={() => false} />);
+      await user.click(screen.getByRole("button", { name: "More" }));
+      expect(document.querySelector(".rfd-more-grid")).not.toBeNull();
+    });
+
+    it("replaces the grid with children, still rendering extraContent below", async () => {
+      const user = userEvent.setup();
+      render(
+        <FloatingDock items={ITEMS} moreItems={MORE_ITEMS} isActive={() => false} extraContent={<p>Extra</p>}>
+          <p>My own design</p>
+        </FloatingDock>,
+      );
+      await user.click(screen.getByRole("button", { name: "More" }));
+      expect(screen.getByText("My own design")).toBeInTheDocument();
+      expect(screen.getByText("Extra")).toBeInTheDocument();
+      expect(document.querySelector(".rfd-more-grid")).toBeNull();
+      expect(screen.queryByRole("link", { name: "Profile" })).not.toBeInTheDocument();
+    });
+
+    it("shows the More button for children alone, and hands them a close helper", async () => {
+      const user = userEvent.setup();
+      render(
+        <FloatingDock items={ITEMS} isActive={() => false}>
+          {({ close }) => <button onClick={close}>Done</button>}
+        </FloatingDock>,
+      );
+      await user.click(screen.getByRole("button", { name: "More" }));
+      await user.click(screen.getByRole("button", { name: "Done" }));
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    });
+
+    it("lets you light the More button yourself, and hide the title row", async () => {
+      const user = userEvent.setup();
+      render(
+        <FloatingDock items={ITEMS} isActive={() => false} moreActive showMoreSheetTitle={false}>
+          <p>Body</p>
+        </FloatingDock>,
+      );
+      expect(within(bar()).getByRole("button", { name: "More" }).querySelector(".rfd-label--active")).not.toBeNull();
+      await user.click(screen.getByRole("button", { name: "More" }));
+      expect(screen.queryByRole("button", { name: "Close" })).not.toBeInTheDocument();
+      expect(screen.getByRole("dialog")).toHaveAccessibleName("Menu");
+    });
+  });
+
   describe("hideOnScroll", () => {
     const scrollTo = (y: number) => {
       Object.defineProperty(window, "scrollY", { value: y, configurable: true });

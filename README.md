@@ -79,6 +79,9 @@ you don't pass one, it falls back to a plain `<a href>`.
 | `closeLabel`      | `string`                               | `"Close"`      | `aria-label` for the sheet's close button.                                    |
 | `extraContent`    | `ReactNode`                            | —              | Rendered below the overflow grid — a natural slot for a theme toggle, sign-out button, language switcher, etc. |
 | `ariaLabel`       | `string`                               | `"Main"`       | `aria-label` on the `<nav>` element.                                          |
+| `children`        | `ReactNode \| ({ close }) => ReactNode` | —              | Your own design for the overflow sheet (see below). With none, the sheet shows `moreItems` as the default grid. |
+| `moreActive`      | `boolean`                              | derived        | Light up the "More" button. Derived from `moreItems` unless you set it — do set it when using custom `children`. |
+| `showMoreSheetTitle` | `boolean`                           | `true`         | Show the sheet's title row and close button. The title still labels the dialog when hidden. |
 | `className`       | `string`                               | —              | Extra class on the `<nav>`, alongside the built-in one.                       |
 | `theme`           | `"dark" \| "light" \| "frosted" \| "liquid"`       | `"dark"`       | Colour preset for the bar and the sheet. Override `--rfd-*` variables for anything custom. |
 | `hideOnScroll`    | `boolean`                              | `true`         | Slide the dock away when scrolling down, bring it back on scroll up (or keyboard focus). Pass `false` to keep it fixed. |
@@ -108,6 +111,28 @@ interface DockActionItem {
 }
 ```
 
+### Custom overflow content
+
+The sheet opens directly on top of the dock. By default it shows `moreItems` as a grid of round
+icons. To design it yourself, pass `children` — a node, or a function that receives `close` so your
+own rows can dismiss the sheet. The "More" button appears whenever there are `moreItems` or children.
+
+```tsx
+<FloatingDock items={PRIMARY} isActive={(href) => href === pathname} moreActive={isInMenuSection}>
+  {({ close }) => (
+    <nav aria-label="More">
+      <AccountSwitcher />
+      <MenuRow href="/members" onClick={close}>Members</MenuRow>
+      <MenuRow href="/settings" onClick={close}>Settings</MenuRow>
+    </nav>
+  )}
+</FloatingDock>
+```
+
+Pair it with `showMoreSheetTitle={false}` for a header-less sheet (it closes by dragging, tapping
+outside, Escape, or More), and use `--rfd-sheet-gap` to leave space between the dock and the sheet.
+`extraContent`, when given, renders below your children.
+
 ### `<FloatingDockSpacer />`
 
 A fixed dock covers the bottom of your page. Render `<FloatingDockSpacer />` as the last child of
@@ -127,6 +152,8 @@ it's useful on its own for any mobile-style sheet (filters, a confirmation promp
 | `children`   | `ReactNode`  | —         | Sheet body.                          |
 | `closeLabel` | `string`     | `"Close"` | `aria-label` for the close button.   |
 | `theme`      | `"dark" \| "light" \| "frosted" \| "liquid"` | `"dark"` | Colour preset.                       |
+| `showHeader` | `boolean`    | `true`    | Show the title row and close button. The title still labels the dialog when hidden. |
+| `bodyClassName` | `string`  | —         | Extra class on the scrolling body.   |
 
 On touch screens the sheet can be dragged down by its handle or header to dismiss it.
 
