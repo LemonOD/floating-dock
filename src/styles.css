@@ -201,13 +201,27 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/*
+ * Wraps the icon and label so the active pill can hug them: a circle (as wide as the tab is tall)
+ * for short labels, growing just enough to hold longer ones, never wider than the tab itself.
+ */
+.rfd-tab-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  box-sizing: border-box;
+  height: 100%;
+  min-width: min(100%, var(--rfd-tab-height));
+  max-width: 100%;
+  padding-inline: 0.5rem;
+}
+
 .rfd-pill {
   position: absolute;
   inset: 0;
-  margin: auto;
-  /* Square, so the pill is a circle (or a rounded square if --rfd-radius is small) centred in the tab. */
-  width: min(100%, var(--rfd-tab-height));
-  height: var(--rfd-tab-height);
   border-radius: var(--rfd-radius);
   background: var(--rfd-accent-bg);
 }

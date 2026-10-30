@@ -182,15 +182,17 @@ export function FloatingDock({
             const active = isActive(item.href);
             return (
               <LinkComponent key={key} href={item.href} className="rfd-tab" aria-current={active ? "page" : undefined}>
-                {active && (
-                  <motion.span
-                    layoutId="rfd-pill"
-                    transition={{ type: "spring", stiffness: 260, damping: 26 }}
-                    className="rfd-pill"
-                  />
-                )}
-                <Icon className={active ? "rfd-icon rfd-icon--active" : "rfd-icon"} />
-                <span className={active ? "rfd-label rfd-label--active" : "rfd-label"}>{label}</span>
+                <span className="rfd-tab-inner">
+                  {active && (
+                    <motion.span
+                      layoutId="rfd-pill"
+                      transition={{ type: "spring", stiffness: 260, damping: 26 }}
+                      className="rfd-pill"
+                    />
+                  )}
+                  <Icon className={active ? "rfd-icon rfd-icon--active" : "rfd-icon"} />
+                  <span className={active ? "rfd-label rfd-label--active" : "rfd-label"}>{label}</span>
+                </span>
                 <Badge value={badge} />
               </LinkComponent>
             );
@@ -198,9 +200,11 @@ export function FloatingDock({
 
           {hasMore && (
             <button type="button" onClick={() => setMoreOpen(true)} aria-label={moreLabel} className="rfd-tab rfd-more-btn">
-              {moreActive && <span className="rfd-pill" />}
-              <MoreHorizontalIcon className={moreActive ? "rfd-icon rfd-icon--active" : "rfd-icon"} />
-              <span className={moreActive ? "rfd-label rfd-label--active" : "rfd-label"}>{moreLabel}</span>
+              <span className="rfd-tab-inner">
+                {moreActive && <span className="rfd-pill" />}
+                <MoreHorizontalIcon className={moreActive ? "rfd-icon rfd-icon--active" : "rfd-icon"} />
+                <span className={moreActive ? "rfd-label rfd-label--active" : "rfd-label"}>{moreLabel}</span>
+              </span>
               <Badge value={moreHasBadge} />
             </button>
           )}
