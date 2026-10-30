@@ -19,6 +19,7 @@
   --rfd-radius: 9999px;
   --rfd-max-width: 32rem;
   --rfd-offset: 0.75rem;
+  --rfd-sheet-gap: 0px; /* space between the top of the dock and the bottom of the sheet */
   --rfd-bar-height: 52px;
   --rfd-tab-height: calc(var(--rfd-bar-height) - 0.75rem - 2px);
   --rfd-badge-bg: #dc2626;
@@ -382,15 +383,16 @@
 .rfd-sheet {
   position: relative;
   z-index: 10;
-  /* Starts just above the dock (same width), leaving the tabs uncovered, and grows upward. */
+  /* Sits directly on the dock (same width), leaving the tabs uncovered, and grows upward. */
   --rfd-dock-top: calc(var(--rfd-offset) + env(safe-area-inset-bottom, 0px) + var(--rfd-bar-height));
   display: flex;
   flex-direction: column;
   width: calc(100% - 2 * var(--rfd-offset));
   max-width: var(--rfd-max-width);
-  max-height: calc(100dvh - var(--rfd-dock-top) - 1.5rem);
-  margin-bottom: calc(var(--rfd-dock-top) + 0.5rem);
-  border-radius: 1.5rem;
+  max-height: calc(100dvh - var(--rfd-dock-top) - var(--rfd-sheet-gap) - 1.5rem);
+  margin-bottom: calc(var(--rfd-dock-top) + var(--rfd-sheet-gap));
+  /* Square-ish bottom corners so it reads as sitting on the dock. */
+  border-radius: 1.5rem 1.5rem 0.75rem 0.75rem;
   border: 1px solid var(--rfd-border);
   background: var(--rfd-bg-solid);
   box-shadow: var(--rfd-shadow);
