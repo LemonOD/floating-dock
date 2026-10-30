@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, type ComponentType, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
+import { motion, useAnimationControls, useReducedMotion } from "framer-motion";
 import { DockDrawer, type DockTheme } from "./DockDrawer";
 import { MoreHorizontalIcon } from "./icons";
 
@@ -106,6 +106,26 @@ function useHiddenOnScroll(enabled: boolean) {
   return hidden;
 }
 
+// useLayoutEffect warns during SSR; the pill is client-only anyway, so fall back to useEffect there.
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+const MORE_KEY = "__rfd-more__";
+
+/** Unhurried, with a little overshoot, so the eye can follow the pill from one tab to the next. */
+const PILL_MOVE = { type: "spring", stiffness: 120, damping: 17, mass: 1 } as const;
+/** While travelling the pill swells taller than the bar's tabs and settles back, like WhatsApp's. */
+const PILL_STRETCH = { scaleY: [1, 1.28, 1], scaleX: [1, 1.04, 1] };
+const PILL_STRETCH_TRANSITION = { duration: 0.7, times: [0, 0.4, 1], ease: "easeInOut" as const };
+
+interface PillRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** Re-measured because the layout changed (resize), not because the active tab did — don't animate. */
+  instant: boolean;
+}
+
 function Badge({ value }: { value: number | string | boolean | undefined }) {
   if (!value) return null;
   if (value === true) return <span className="rfd-badge rfd-badge--dot" aria-hidden="true" />;
@@ -147,6 +167,61 @@ export function FloatingDock({
   const hidden = useHiddenOnScroll(hideOnScroll);
   const [focusWithin, setFocusWithin] = useState(false);
 
+  // One pill for the whole bar, measured against the active tab's content and animated between tabs.
+  const activeKey = items.find((item) => item.href !== undefined && isActive(item.href))?.key ?? (moreActive ? MORE_KEY : null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const contentRefs = useRef(new Map<string, HTMLElement>());
+  const [pill, setPill] = useState<PillRect | null>(null);
+  const stretch = useAnimationControls();
+  const reducedMotion = useReducedMotion();
+  const registerContent = useCallback((key: string, el: HTMLElement | null) => {
+    if (el) contentRefs.current.set(key, el);
+    else contentRefs.current.delete(key);
+  }, []);
+
+  const measure = useCallback(
+    (instant: boolean) => {
+      const track = trackRef.current;
+      const content = activeKey === null ? undefined : contentRefs.current.get(activeKey);
+      if (!track || !content) return;
+      const t = track.getBoundingClientRect();
+      const c = content.getBoundingClientRect();
+      const next = {
+        x: c.left - t.left - track.clientLeft,
+        y: c.top - t.top - track.clientTop,
+        width: c.width,
+        height: c.height,
+        instant,
+      };
+      setPill((prev) =>
+        prev && prev.x === next.x && prev.y === next.y && prev.width === next.width && prev.height === next.height
+          ? prev
+          : next,
+      );
+    },
+    [activeKey],
+  );
+
+  useIsomorphicLayoutEffect(() => measure(false), [measure, items, moreLabel, hasMore]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => measure(true));
+    observer.observe(track);
+    contentRefs.current.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [measure, items.length, hasMore]);
+
+  const previousKey = useRef(activeKey);
+  useEffect(() => {
+    const from = previousKey.current;
+    previousKey.current = activeKey;
+    if (from !== null && activeKey !== null && from !== activeKey && !reducedMotion) {
+      void stretch.start({ ...PILL_STRETCH, transition: PILL_STRETCH_TRANSITION });
+    }
+  }, [activeKey, reducedMotion, stretch]);
+
   return (
     <>
       <nav
@@ -156,7 +231,23 @@ export function FloatingDock({
         onFocus={() => setFocusWithin(true)}
         onBlur={() => setFocusWithin(false)}
       >
-        <div className="rfd-track">
+        <div className="rfd-track" ref={trackRef}>
+          {pill && (
+            <motion.span
+              aria-hidden="true"
+              className="rfd-pill-slot"
+              initial={false}
+              animate={{ x: pill.x, width: pill.width, opacity: activeKey === null ? 0 : 1 }}
+              transition={
+                pill.instant || reducedMotion
+                  ? { duration: 0 }
+                  : { x: PILL_MOVE, width: PILL_MOVE, opacity: { duration: 0.2 } }
+              }
+              style={{ top: pill.y, height: pill.height }}
+            >
+              <motion.span className="rfd-pill" animate={stretch} />
+            </motion.span>
+          )}
           {items.map((item) => {
             const { key, label, icon: Icon, badge } = item;
             if (item.href === undefined) {
@@ -182,14 +273,7 @@ export function FloatingDock({
             const active = isActive(item.href);
             return (
               <LinkComponent key={key} href={item.href} className="rfd-tab" aria-current={active ? "page" : undefined}>
-                <span className="rfd-tab-inner">
-                  {active && (
-                    <motion.span
-                      layoutId="rfd-pill"
-                      transition={{ type: "spring", stiffness: 260, damping: 26 }}
-                      className="rfd-pill"
-                    />
-                  )}
+                <span className="rfd-tab-inner" ref={(el) => registerContent(key, el)}>
                   <Icon className={active ? "rfd-icon rfd-icon--active" : "rfd-icon"} />
                   <span className={active ? "rfd-label rfd-label--active" : "rfd-label"}>{label}</span>
                 </span>
@@ -200,8 +284,7 @@ export function FloatingDock({
 
           {hasMore && (
             <button type="button" onClick={() => setMoreOpen(true)} aria-label={moreLabel} className="rfd-tab rfd-more-btn">
-              <span className="rfd-tab-inner">
-                {moreActive && <span className="rfd-pill" />}
+              <span className="rfd-tab-inner" ref={(el) => registerContent(MORE_KEY, el)}>
                 <MoreHorizontalIcon className={moreActive ? "rfd-icon rfd-icon--active" : "rfd-icon"} />
                 <span className={moreActive ? "rfd-label rfd-label--active" : "rfd-label"}>{moreLabel}</span>
               </span>

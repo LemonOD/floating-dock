@@ -42,12 +42,13 @@ describe("FloatingDock", () => {
     expect(within(bar()).getByRole("link", { name: "Home" })).not.toHaveAttribute("aria-current");
   });
 
-  it("renders the sliding pill only behind the active item", () => {
-    render(<FloatingDock items={ITEMS} isActive={(href) => href === "/home"} />);
-    const home = within(bar()).getByRole("link", { name: "Home" });
-    const search = within(bar()).getByRole("link", { name: "Search" });
-    expect(home.querySelector(".rfd-pill")).not.toBeNull();
-    expect(search.querySelector(".rfd-pill")).toBeNull();
+  it("renders a single pill, and only once something is active", () => {
+    const { rerender } = render(<FloatingDock items={ITEMS} isActive={() => false} />);
+    expect(bar().querySelector(".rfd-pill")).toBeNull();
+    rerender(<FloatingDock items={ITEMS} isActive={(href) => href === "/home"} />);
+    expect(bar().querySelectorAll(".rfd-pill")).toHaveLength(1);
+    rerender(<FloatingDock items={ITEMS} isActive={(href) => href === "/search"} />);
+    expect(bar().querySelectorAll(".rfd-pill")).toHaveLength(1);
   });
 
   it("renders no More button when moreItems is omitted", () => {
@@ -73,7 +74,8 @@ describe("FloatingDock", () => {
   it("highlights More (and no primary tab) when a secondary item is active", () => {
     render(<FloatingDock items={ITEMS} moreItems={MORE_ITEMS} isActive={(href) => href === "/profile"} />);
     const moreButton = within(bar()).getByRole("button", { name: "More" });
-    expect(moreButton.querySelector(".rfd-pill")).not.toBeNull();
+    expect(bar().querySelectorAll(".rfd-pill")).toHaveLength(1);
+    expect(moreButton.querySelector(".rfd-label--active")).not.toBeNull();
     expect(within(bar()).getAllByRole("link").every((l) => !l.hasAttribute("aria-current"))).toBe(true);
   });
 

@@ -132,9 +132,6 @@
   backdrop-filter: blur(28px) saturate(200%) brightness(1.06);
   -webkit-backdrop-filter: blur(28px) saturate(200%) brightness(1.06);
 }
-[data-rfd-theme="liquid"] .rfd-track {
-  position: relative;
-}
 /* Soft highlight sweeping in from the top-left corner, like light catching the glass. */
 [data-rfd-theme="liquid"] .rfd-track::before {
   content: "";
@@ -167,6 +164,7 @@
 }
 
 .rfd-track {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -219,9 +217,16 @@
   padding-inline: 0.5rem;
 }
 
-.rfd-pill {
+/* Positioned and sized by <FloatingDock /> to hug the active tab; `.rfd-pill` inside is what you see. */
+.rfd-pill-slot {
   position: absolute;
-  inset: 0;
+  left: 0;
+  pointer-events: none;
+}
+.rfd-pill {
+  display: block;
+  width: 100%;
+  height: 100%;
   border-radius: var(--rfd-radius);
   background: var(--rfd-accent-bg);
 }
