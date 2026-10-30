@@ -79,6 +79,9 @@ you don't pass one, it falls back to a plain `<a href>`.
 | `closeLabel`      | `string`                               | `"Close"`      | `aria-label` for the sheet's close button.                                    |
 | `extraContent`    | `ReactNode`                            | —              | Rendered below the overflow grid — a natural slot for a theme toggle, sign-out button, language switcher, etc. |
 | `ariaLabel`       | `string`                               | `"Main"`       | `aria-label` on the `<nav>` element.                                          |
+| `moreLayout`      | `"grid" \| "list"`                     | `"grid"`       | How the overflow sheet lays out `moreItems`: round icons three across, or full-width rows with chevrons and a highlighted current page (see below). |
+| `moreHeader`      | `ReactNode`                            | —              | Rendered at the top of the sheet, above the items — e.g. an account switcher card. |
+| `showMoreSheetTitle` | `boolean`                           | `true` for grid, `false` for list | Show the sheet's title row and close button. The title still labels the dialog when hidden; the sheet closes by dragging, tapping outside, Escape, or More. |
 | `className`       | `string`                               | —              | Extra class on the `<nav>`, alongside the built-in one.                       |
 | `theme`           | `"dark" \| "light" \| "frosted" \| "liquid"`       | `"dark"`       | Colour preset for the bar and the sheet. Override `--rfd-*` variables for anything custom. |
 | `hideOnScroll`    | `boolean`                              | `true`         | Slide the dock away when scrolling down, bring it back on scroll up (or keyboard focus). Pass `false` to keep it fixed. |
@@ -92,6 +95,7 @@ interface DockLinkItem {
   label: string;
   icon: ComponentType<{ className?: string }>; // any icon component — lucide-react, heroicons, your own SVGs
   badge?: number | string | boolean; // 5, "99+", or true for a dot. 0/false hide it.
+  section?: string;  // heading to group this item under in the overflow sheet
 }
 
 // If any moreItem carries a badge, the "More" button itself gets a plain attention dot — so
@@ -107,6 +111,30 @@ interface DockActionItem {
   badge?: number | string | boolean;
 }
 ```
+
+### Overflow sheet layouts
+
+The sheet opens directly on top of the dock. With `moreLayout="list"` it becomes a settings-style
+menu: full-width rows (icon, label, chevron), the current page highlighted, and no title row.
+Give items a `section` to group them under headings, and use `moreHeader` for a card above them:
+
+```tsx
+<FloatingDock
+  items={PRIMARY}
+  moreLayout="list"
+  moreHeader={<AccountSwitcher />}
+  moreItems={[
+    { key: "overview", href: "/overview", label: "Overview", icon: PieChart },
+    { key: "members", href: "/members", label: "Members", icon: Users },
+    { key: "investments", href: "/investments", label: "Investments", icon: BarChart, section: "Invest" },
+    { key: "deals", href: "/deals", label: "Deals", icon: Database, section: "Invest" },
+    { key: "settings", href: "/settings", label: "Settings", icon: Settings, section: "Administer" },
+  ]}
+  isActive={(href) => href === pathname}
+/>
+```
+
+`--rfd-sheet-gap` (default `0px`) adds space between the dock and the sheet if you want it.
 
 ### `<FloatingDockSpacer />`
 
@@ -127,6 +155,8 @@ it's useful on its own for any mobile-style sheet (filters, a confirmation promp
 | `children`   | `ReactNode`  | —         | Sheet body.                          |
 | `closeLabel` | `string`     | `"Close"` | `aria-label` for the close button.   |
 | `theme`      | `"dark" \| "light" \| "frosted" \| "liquid"` | `"dark"` | Colour preset.                       |
+| `showHeader` | `boolean`    | `true`    | Show the title row and close button. The title still labels the dialog when hidden. |
+| `bodyClassName` | `string`  | —         | Extra class on the scrolling body.   |
 
 On touch screens the sheet can be dragged down by its handle or header to dismiss it.
 

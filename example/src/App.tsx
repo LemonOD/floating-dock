@@ -20,7 +20,7 @@ const PRIMARY: DockItem[] = [
 
 const MORE: DockItem[] = [
   { key: "profile", href: "/profile", label: "Profile", icon: User, badge: 2 },
-  { key: "password", href: "/password", label: "Password", icon: KeyRound },
+  { key: "password", href: "/password", label: "Password", icon: KeyRound, section: "Account" },
 ];
 
 // Simulates a router: a real app would pass next/link's <Link>, react-router's <Link>, etc.
@@ -43,6 +43,7 @@ function FakeLink({ href, children, className, onClick, ...rest }: DockLinkProps
 
 export function App() {
   const [path, setPath] = useState("/home");
+  const [layout, setLayout] = useState<"grid" | "list">("list");
 
   useState(() => {
     window.addEventListener("fake-navigate", (e) => setPath((e as CustomEvent).detail));
@@ -63,6 +64,13 @@ export function App() {
         <p style={{ color: "#94a3b8", fontSize: "0.9rem" }}>
           Current page: <strong style={{ color: "#3b82f6" }}>{path}</strong>
         </p>
+        <button
+          type="button"
+          onClick={() => setLayout((l) => (l === "grid" ? "list" : "grid"))}
+          style={{ margin: "0.5rem 0", padding: "0.4rem 0.8rem", borderRadius: 8, border: "1px solid #475569", background: "transparent", color: "inherit" }}
+        >
+          More layout: {layout}
+        </button>
         <p style={{ color: "#94a3b8", fontSize: "0.85rem", lineHeight: 1.5 }}>
           Tap a tab below, or open &quot;More&quot; for the overflow sheet. This mimics a router by
           swapping a bit of local state — a real app passes its own Link component instead of{" "}
@@ -91,6 +99,8 @@ export function App() {
         isActive={(href) => href === path}
         LinkComponent={FakeLink}
         theme="liquid"
+        moreLayout={layout}
+        moreHeader={<strong>Freshest · Angel group</strong>}
         extraContent={
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem", marginTop: "1rem" }}>
             <button className="rfd-more-item" type="button">

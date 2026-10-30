@@ -504,3 +504,106 @@
   font-weight: 500;
   color: var(--rfd-text);
 }
+
+/* --- Overflow sheet: groups, header slot, and the "list" layout --- */
+
+.rfd-more-header {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--rfd-border);
+}
+
+.rfd-more-group + .rfd-more-group {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--rfd-border);
+}
+
+.rfd-more-heading {
+  margin: 0;
+  padding: 0.5rem 0.75rem 0.25rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rfd-text-muted);
+}
+
+.rfd-sheet-body--list {
+  padding: 0.5rem 0.75rem 1rem;
+}
+
+.rfd-more-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.rfd-row {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0 0.75rem;
+  border: none;
+  border-radius: 0.875rem;
+  background: transparent;
+  color: var(--rfd-text);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.rfd-row:hover {
+  background: var(--rfd-hover);
+}
+.rfd-row:focus-visible {
+  outline: 2px solid var(--rfd-focus, var(--rfd-accent-text));
+  outline-offset: -2px;
+}
+.rfd-row--active,
+.rfd-row--active:hover {
+  background: var(--rfd-accent-bg);
+  color: var(--rfd-accent-text);
+}
+
+.rfd-row-icon {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  color: var(--rfd-text-muted);
+}
+.rfd-row--active .rfd-row-icon {
+  color: var(--rfd-accent-text);
+}
+.rfd-row-glyph {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+.rfd-row-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.rfd-row-chevron {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--rfd-text-muted);
+}
+.rfd-row--active .rfd-row-chevron {
+  color: var(--rfd-accent-text);
+}
+.rfd-row-icon .rfd-badge {
+  top: -0.35rem;
+  left: auto;
+  right: -0.5rem;
+}
+.rfd-row-icon .rfd-badge--dot {
+  top: -0.1rem;
+  right: -0.15rem;
+}

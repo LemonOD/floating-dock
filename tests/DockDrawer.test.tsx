@@ -163,4 +163,16 @@ describe("DockDrawer", () => {
     expect(document.querySelector(".rfd-handle")).not.toBeNull();
     expect(document.querySelector('.rfd-overlay-wrap[data-rfd-theme="light"]')).not.toBeNull();
   });
+
+  it("can hide the header while keeping the dialog labelled", () => {
+    render(
+      <DockDrawer open onClose={vi.fn()} title="Menu" showHeader={false} bodyClassName="custom-body">
+        <p>Body</p>
+      </DockDrawer>,
+    );
+    expect(screen.queryByRole("heading", { name: "Menu" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Close" })).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Menu");
+    expect(document.querySelector(".rfd-sheet-body.custom-body")).not.toBeNull();
+  });
 });

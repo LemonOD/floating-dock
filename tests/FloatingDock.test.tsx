@@ -276,6 +276,81 @@ describe("FloatingDock", () => {
     });
   });
 
+  describe("overflow sheet layouts", () => {
+    const SECTIONED: DockItem[] = [
+      { key: "overview", href: "/overview", label: "Overview", icon: Icon },
+      { key: "invest", href: "/investments", label: "Investments", icon: Icon, section: "Invest" },
+      { key: "deals", href: "/deals", label: "Deals", icon: Icon, section: "Invest" },
+      { key: "settings", href: "/settings", label: "Settings", icon: Icon, section: "Administer" },
+    ];
+
+    it("defaults to the grid with a title row and close button", async () => {
+      const user = userEvent.setup();
+      render(<FloatingDock items={ITEMS} moreItems={MORE_ITEMS} isActive={() => false} />);
+      await user.click(screen.getByRole("button", { name: "More" }));
+      expect(document.querySelector(".rfd-more-grid")).not.toBeNull();
+      expect(document.querySelector(".rfd-more-list")).toBeNull();
+      expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
+    });
+
+    it("list layout renders rows with chevrons, marks the current page, and drops the title row", async () => {
+      const user = userEvent.setup();
+      render(
+        <FloatingDock items={ITEMS} moreItems={SECTIONED} isActive={(href) => href === "/overview"} moreLayout="list" />,
+      );
+      await user.click(screen.getByRole("button", { name: "More" }));
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.querySelector(".rfd-more-list")).not.toBeNull();
+      expect(dialog.querySelectorAll(".rfd-row-chevron")).toHaveLength(4);
+      const current = within(dialog).getByRole("link", { name: "Overview" });
+      expect(current).toHaveClass("rfd-row--active");
+      expect(current).toHaveAttribute("aria-current", "page");
+      expect(within(dialog).queryByRole("button", { name: "Close" })).not.toBeInTheDocument();
+      expect(within(dialog).queryByRole("heading", { name: "Menu" })).not.toBeInTheDocument();
+      expect(dialog).toHaveAccessibleName("Menu");
+    });
+
+    it("can show the title row in list layout, and hide it in grid layout", async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(
+        <FloatingDock items={ITEMS} moreItems={SECTIONED} isActive={() => false} moreLayout="list" showMoreSheetTitle />,
+      );
+      await user.click(screen.getByRole("button", { name: "More" }));
+      expect(screen.getByRole("heading", { name: "Menu" })).toBeInTheDocument();
+      await user.keyboard("{Escape}");
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      rerender(<FloatingDock items={ITEMS} moreItems={SECTIONED} isActive={() => false} showMoreSheetTitle={false} />);
+      await user.click(screen.getByRole("button", { name: "More" }));
+      expect(screen.queryByRole("heading", { name: "Menu" })).not.toBeInTheDocument();
+    });
+
+    it("groups consecutive items under their section heading", async () => {
+      const user = userEvent.setup();
+      render(<FloatingDock items={ITEMS} moreItems={SECTIONED} isActive={() => false} moreLayout="list" />);
+      await user.click(screen.getByRole("button", { name: "More" }));
+      const invest = screen.getByRole("group", { name: "Invest" });
+      expect(within(invest).getAllByRole("link").map((l) => l.textContent)).toEqual(["Investments", "Deals"]);
+      expect(within(screen.getByRole("group", { name: "Administer" })).getAllByRole("link")).toHaveLength(1);
+    });
+
+    it("renders moreHeader above the items", async () => {
+      const user = userEvent.setup();
+      render(
+        <FloatingDock
+          items={ITEMS}
+          moreItems={MORE_ITEMS}
+          isActive={() => false}
+          moreLayout="list"
+          moreHeader={<div>Freshest · Angel group</div>}
+        />,
+      );
+      await user.click(screen.getByRole("button", { name: "More" }));
+      const header = screen.getByText("Freshest · Angel group");
+      const firstLink = screen.getByRole("link", { name: "Profile" });
+      expect(header.compareDocumentPosition(firstLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+  });
+
   describe("hideOnScroll", () => {
     const scrollTo = (y: number) => {
       Object.defineProperty(window, "scrollY", { value: y, configurable: true });
