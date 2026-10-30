@@ -12,10 +12,6 @@ export interface DockDrawerProps {
   children: ReactNode;
   /** aria-label for the close button. @default "Close" */
   closeLabel?: string;
-  /** Show the title row with its close button. The title still labels the dialog when hidden. @default true */
-  showHeader?: boolean;
-  /** Extra class on the scrolling body, e.g. to change its padding. */
-  bodyClassName?: string;
   /** Colour preset, matching {@link FloatingDock}'s `theme`. @default "dark" */
   theme?: DockTheme;
 }
@@ -33,7 +29,7 @@ const DISMISS_VELOCITY = 500;
  * A bottom sheet that slides up from the dock's position at every viewport width. Used by {@link FloatingDock}
  * for its overflow menu, but works standalone for any mobile-style sheet.
  */
-export function DockDrawer({ open, onClose, title, children, closeLabel = "Close", showHeader = true, bodyClassName, theme }: DockDrawerProps) {
+export function DockDrawer({ open, onClose, title, children, closeLabel = "Close", theme }: DockDrawerProps) {
   // Portals need a DOM node, which doesn't exist during SSR — render nothing until mounted client-side.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -121,21 +117,19 @@ export function DockDrawer({ open, onClose, title, children, closeLabel = "Close
             <div className="rfd-sheet-grab" onPointerDown={(event) => dragControls.start(event)}>
               <span className="rfd-handle" aria-hidden="true" />
             </div>
-            {showHeader && (
-              <div className="rfd-sheet-header" onPointerDown={(event) => dragControls.start(event)}>
-                <h2 className="rfd-sheet-title">{title}</h2>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  onPointerDown={(event) => event.stopPropagation()}
-                  aria-label={closeLabel}
-                  className="rfd-close-btn"
-                >
-                  <CloseIcon className="rfd-close-icon" />
-                </button>
-              </div>
-            )}
-            <div className={["rfd-sheet-body", bodyClassName].filter(Boolean).join(" ")}>{children}</div>
+            <div className="rfd-sheet-header" onPointerDown={(event) => dragControls.start(event)}>
+              <h2 className="rfd-sheet-title">{title}</h2>
+              <button
+                type="button"
+                onClick={onClose}
+                onPointerDown={(event) => event.stopPropagation()}
+                aria-label={closeLabel}
+                className="rfd-close-btn"
+              >
+                <CloseIcon className="rfd-close-icon" />
+              </button>
+            </div>
+            <div className="rfd-sheet-body">{children}</div>
           </motion.div>
         </div>
       )}

@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useId, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { motion, useAnimationControls, useReducedMotion, type Transition } from "framer-motion";
 import { DockDrawer, type DockTheme } from "./DockDrawer";
-import { ChevronRightIcon, MoreHorizontalIcon } from "./icons";
+import { MoreHorizontalIcon } from "./icons";
 
 interface DockItemBase {
   /** Unique React key. Usually the same as `href`. */
@@ -15,11 +15,6 @@ interface DockItemBase {
    * Numbers and text are part of the item's accessible name.
    */
   badge?: number | string | boolean;
-  /**
-   * Heading to group this item under in the overflow sheet (e.g. "Invest"). Consecutive items
-   * sharing a `section` are grouped under one heading; items without one sit in an untitled group.
-   */
-  section?: string;
 }
 
 /** A navigable destination, rendered through `LinkComponent`. */
@@ -70,20 +65,6 @@ export interface FloatingDockProps {
   moreSheetTitle?: string;
   /** Passed through to the overflow sheet's close button. @default "Close" */
   closeLabel?: string;
-  /**
-   * How the overflow sheet lays out `moreItems`: `"grid"` (round icons, three across) or `"list"`
-   * (full-width rows with a chevron and a highlighted current page, like a settings menu).
-   * @default "grid"
-   */
-  moreLayout?: "grid" | "list";
-  /** Rendered at the top of the overflow sheet, above the items — e.g. an account switcher card. */
-  moreHeader?: ReactNode;
-  /**
-   * Show the sheet's title row and close button. The title still labels the dialog for assistive
-   * tech when hidden; the sheet can be dismissed by dragging it, tapping outside, or Escape.
-   * @default true for "grid", false for "list"
-   */
-  showMoreSheetTitle?: boolean;
   /** Rendered at the bottom of the overflow sheet — a natural slot for a theme toggle, sign-out, etc. */
   extraContent?: ReactNode;
   /** @default "Main" */
@@ -173,9 +154,6 @@ export function FloatingDock({
   moreSheetTitle = "Menu",
   closeLabel = "Close",
   extraContent,
-  moreLayout = "grid",
-  moreHeader,
-  showMoreSheetTitle = moreLayout === "grid",
   ariaLabel = "Main",
   className,
   theme,
@@ -186,13 +164,6 @@ export function FloatingDock({
   const moreActive = hasMore && moreItems.some((item) => item.href !== undefined && isActive(item.href));
   // A plain dot, not a count: the point is "something in here needs attention", not how much.
   const moreHasBadge = hasMore && moreItems.some((item) => !!item.badge);
-  const sheetId = useId();
-  const moreGroups = moreItems.reduce<{ title?: string; items: DockItem[] }[]>((groups, item) => {
-    const last = groups[groups.length - 1];
-    if (last && last.title === item.section) last.items.push(item);
-    else groups.push({ title: item.section, items: [item] });
-    return groups;
-  }, []);
   const hidden = useHiddenOnScroll(hideOnScroll);
   const [focusWithin, setFocusWithin] = useState(false);
 
@@ -333,86 +304,41 @@ export function FloatingDock({
       </nav>
 
       {hasMore && (
-        <DockDrawer
-          open={moreOpen}
-          onClose={() => setMoreOpen(false)}
-          title={moreSheetTitle}
-          closeLabel={closeLabel}
-          theme={theme}
-          showHeader={showMoreSheetTitle}
-          bodyClassName={moreLayout === "list" ? "rfd-sheet-body--list" : undefined}
-        >
-          {moreHeader && <div className="rfd-more-header">{moreHeader}</div>}
-          {moreGroups.map((group, index) => {
-            const headingId = `${sheetId}-${index}`;
-            return (
-              <div
-                key={index}
-                className="rfd-more-group"
-                role={group.title ? "group" : undefined}
-                aria-labelledby={group.title ? headingId : undefined}
-              >
-                {group.title && (
-                  <h3 id={headingId} className="rfd-more-heading">
-                    {group.title}
-                  </h3>
-                )}
-                <div className={moreLayout === "list" ? "rfd-more-list" : "rfd-more-grid"}>
-                  {group.items.map((item) => {
-                    const { key, label, icon: Icon, badge } = item;
-                    const active = item.href !== undefined && isActive(item.href);
-                    const content =
-                      moreLayout === "list" ? (
-                        <>
-                          <span className="rfd-row-icon">
-                            <Icon className="rfd-row-glyph" />
-                            <Badge value={badge} />
-                          </span>
-                          <span className="rfd-row-label">{label}</span>
-                          {item.href !== undefined && <ChevronRightIcon className="rfd-row-chevron" />}
-                        </>
-                      ) : (
-                        <>
-                          <span className={active ? "rfd-more-icon-circle rfd-more-icon-circle--active" : "rfd-more-icon-circle"}>
-                            <Icon className="rfd-more-icon" />
-                            <Badge value={badge} />
-                          </span>
-                          <span className="rfd-more-label">{label}</span>
-                        </>
-                      );
-                    const itemClass =
-                      moreLayout === "list" ? (active ? "rfd-row rfd-row--active" : "rfd-row") : "rfd-more-item";
-                    if (item.href === undefined) {
-                      return (
-                        <button
-                          key={key}
-                          type="button"
-                          className={itemClass}
-                          onClick={() => {
-                            setMoreOpen(false);
-                            item.onClick();
-                          }}
-                        >
-                          {content}
-                        </button>
-                      );
-                    }
-                    return (
-                      <LinkComponent
-                        key={key}
-                        href={item.href}
-                        className={itemClass}
-                        aria-current={active ? "page" : undefined}
-                        onClick={() => setMoreOpen(false)}
-                      >
-                        {content}
-                      </LinkComponent>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
+        <DockDrawer open={moreOpen} onClose={() => setMoreOpen(false)} title={moreSheetTitle} closeLabel={closeLabel} theme={theme}>
+          <div className="rfd-more-grid">
+            {moreItems.map((item) => {
+              const { key, label, icon: Icon, badge } = item;
+              const active = item.href !== undefined && isActive(item.href);
+              const circle = (
+                <span className={active ? "rfd-more-icon-circle rfd-more-icon-circle--active" : "rfd-more-icon-circle"}>
+                  <Icon className="rfd-more-icon" />
+                  <Badge value={badge} />
+                </span>
+              );
+              if (item.href === undefined) {
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    className="rfd-more-item"
+                    onClick={() => {
+                      setMoreOpen(false);
+                      item.onClick();
+                    }}
+                  >
+                    {circle}
+                    <span className="rfd-more-label">{label}</span>
+                  </button>
+                );
+              }
+              return (
+                <LinkComponent key={key} href={item.href} className="rfd-more-item" onClick={() => setMoreOpen(false)}>
+                  {circle}
+                  <span className="rfd-more-label">{label}</span>
+                </LinkComponent>
+              );
+            })}
+          </div>
           {extraContent}
         </DockDrawer>
       )}
