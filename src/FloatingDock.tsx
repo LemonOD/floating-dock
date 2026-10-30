@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
-import { motion, useAnimationControls, useReducedMotion } from "framer-motion";
+import { motion, useAnimationControls, useReducedMotion, type Transition } from "framer-motion";
 import { DockDrawer, type DockTheme } from "./DockDrawer";
 import { MoreHorizontalIcon } from "./icons";
 
@@ -115,7 +115,7 @@ const MORE_KEY = "__rfd-more__";
 const PILL_MOVE = { type: "spring", stiffness: 120, damping: 17, mass: 1 } as const;
 /** While travelling the pill swells taller than the bar's tabs and settles back, like WhatsApp's. */
 const PILL_STRETCH = { scaleY: [1, 1.28, 1], scaleX: [1, 1.04, 1] };
-const PILL_STRETCH_TRANSITION = { duration: 0.7, times: [0, 0.4, 1], ease: "easeInOut" as const };
+const PILL_STRETCH_TRANSITION: Transition = { duration: 0.7, times: [0, 0.4, 1], ease: "easeInOut" };
 
 interface PillRect {
   x: number;
