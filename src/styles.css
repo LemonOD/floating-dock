@@ -40,6 +40,10 @@
   font-family: var(--rfd-font);
   transition: transform 0.25s ease;
 }
+/* Keeps the dock above the dimmed backdrop while the sheet is open, so the tabs stay usable. */
+.rfd-bar--raised {
+  z-index: 51;
+}
 .rfd-bar--hidden {
   transform: translateY(calc(100% + var(--rfd-offset) + env(safe-area-inset-bottom, 0px)));
 }
@@ -378,10 +382,14 @@
 .rfd-sheet {
   position: relative;
   z-index: 10;
-  /* Occupies the dock's own footprint (same width and gap) and grows upward from it. */
+  /* Starts just above the dock (same width), leaving the tabs uncovered, and grows upward. */
+  --rfd-dock-top: calc(var(--rfd-offset) + env(safe-area-inset-bottom, 0px) + var(--rfd-bar-height));
+  display: flex;
+  flex-direction: column;
   width: calc(100% - 2 * var(--rfd-offset));
   max-width: var(--rfd-max-width);
-  margin-bottom: calc(var(--rfd-offset) + env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - var(--rfd-dock-top) - 1.5rem);
+  margin-bottom: calc(var(--rfd-dock-top) + 0.5rem);
   border-radius: 1.5rem;
   border: 1px solid var(--rfd-border);
   background: var(--rfd-bg-solid);
@@ -442,7 +450,7 @@
 }
 
 .rfd-sheet-body {
-  max-height: 75vh;
+  min-height: 0;
   overflow-y: auto;
   padding: 1.25rem;
 }

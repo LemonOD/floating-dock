@@ -255,6 +255,27 @@ describe("FloatingDock", () => {
     });
   });
 
+  describe("overflow sheet and dock", () => {
+    it("keeps the dock visible and raised while the sheet is open, and toggles it from More", async () => {
+      const user = userEvent.setup();
+      render(<FloatingDock items={ITEMS} moreItems={MORE_ITEMS} isActive={() => false} />);
+      await user.click(screen.getByRole("button", { name: "More" }));
+      expect(bar()).toHaveClass("rfd-bar--raised");
+      expect(screen.getByRole("button", { name: "More" })).toHaveAttribute("aria-expanded", "true");
+      await user.click(screen.getByRole("button", { name: "More" }));
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      expect(bar()).not.toHaveClass("rfd-bar--raised");
+    });
+
+    it("closes the sheet when a dock tab is used", async () => {
+      const user = userEvent.setup();
+      render(<FloatingDock items={ITEMS} moreItems={MORE_ITEMS} isActive={() => false} />);
+      await user.click(screen.getByRole("button", { name: "More" }));
+      await user.click(within(bar()).getByRole("link", { name: "Home" }));
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    });
+  });
+
   describe("hideOnScroll", () => {
     const scrollTo = (y: number) => {
       Object.defineProperty(window, "scrollY", { value: y, configurable: true });

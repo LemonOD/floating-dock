@@ -226,7 +226,7 @@ export function FloatingDock({
     <>
       <nav
         aria-label={ariaLabel}
-        className={["rfd-bar", hidden && !focusWithin && "rfd-bar--hidden", className].filter(Boolean).join(" ")}
+        className={["rfd-bar", hidden && !focusWithin && !moreOpen && "rfd-bar--hidden", moreOpen && "rfd-bar--raised", className].filter(Boolean).join(" ")}
         data-rfd-theme={theme}
         onFocus={() => setFocusWithin(true)}
         onBlur={() => setFocusWithin(false)}
@@ -255,7 +255,10 @@ export function FloatingDock({
                 <button
                   key={key}
                   type="button"
-                  onClick={item.onClick}
+                  onClick={() => {
+                    setMoreOpen(false);
+                    item.onClick();
+                  }}
                   className={item.prominent ? "rfd-tab rfd-tab--prominent" : "rfd-tab"}
                 >
                   {item.prominent ? (
@@ -272,7 +275,13 @@ export function FloatingDock({
             }
             const active = isActive(item.href);
             return (
-              <LinkComponent key={key} href={item.href} className="rfd-tab" aria-current={active ? "page" : undefined}>
+              <LinkComponent
+                key={key}
+                href={item.href}
+                className="rfd-tab"
+                aria-current={active ? "page" : undefined}
+                onClick={() => setMoreOpen(false)}
+              >
                 <span className="rfd-tab-inner" ref={(el) => registerContent(key, el)}>
                   <Icon className={active ? "rfd-icon rfd-icon--active" : "rfd-icon"} />
                   <span className={active ? "rfd-label rfd-label--active" : "rfd-label"}>{label}</span>
@@ -283,7 +292,7 @@ export function FloatingDock({
           })}
 
           {hasMore && (
-            <button type="button" onClick={() => setMoreOpen(true)} aria-label={moreLabel} className="rfd-tab rfd-more-btn">
+            <button type="button" onClick={() => setMoreOpen((open) => !open)} aria-expanded={moreOpen} aria-label={moreLabel} className="rfd-tab rfd-more-btn">
               <span className="rfd-tab-inner" ref={(el) => registerContent(MORE_KEY, el)}>
                 <MoreHorizontalIcon className={moreActive ? "rfd-icon rfd-icon--active" : "rfd-icon"} />
                 <span className={moreActive ? "rfd-label rfd-label--active" : "rfd-label"}>{moreLabel}</span>
