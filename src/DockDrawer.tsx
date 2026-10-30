@@ -26,7 +26,7 @@ const DISMISS_OFFSET = 100;
 const DISMISS_VELOCITY = 500;
 
 /**
- * A bottom sheet on narrow viewports, a centered modal from `sm` up. Used by {@link FloatingDock}
+ * A bottom sheet that slides up from the dock's position at every viewport width. Used by {@link FloatingDock}
  * for its overflow menu, but works standalone for any mobile-style sheet.
  */
 export function DockDrawer({ open, onClose, title, children, closeLabel = "Close", theme }: DockDrawerProps) {
@@ -99,9 +99,9 @@ export function DockDrawer({ open, onClose, title, children, closeLabel = "Close
             aria-modal="true"
             aria-label={title}
             className="rfd-sheet"
-            initial={{ y: "100%" }}
+            initial={{ y: "120%" }}
             animate={{ y: 0 }}
-            exit={{ y: "100%" }}
+            exit={{ y: "120%" }}
             transition={{ type: "spring", damping: 28, stiffness: 300 }}
             drag="y"
             dragControls={dragControls}

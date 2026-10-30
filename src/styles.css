@@ -320,11 +320,6 @@
   justify-content: center;
   font-family: var(--rfd-font);
 }
-@media (min-width: 640px) {
-  .rfd-overlay-wrap {
-    align-items: center;
-  }
-}
 
 .rfd-overlay {
   position: absolute;
@@ -335,17 +330,14 @@
 .rfd-sheet {
   position: relative;
   z-index: 10;
-  width: 100%;
-  max-width: 32rem;
-  border-radius: 1.5rem 1.5rem 0 0;
+  /* Occupies the dock's own footprint (same width and gap) and grows upward from it. */
+  width: calc(100% - 2 * var(--rfd-offset));
+  max-width: var(--rfd-max-width);
+  margin-bottom: calc(var(--rfd-offset) + env(safe-area-inset-bottom, 0px));
+  border-radius: 1.5rem;
   border: 1px solid var(--rfd-border);
   background: var(--rfd-bg-solid);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-@media (min-width: 640px) {
-  .rfd-sheet {
-    border-radius: 1.5rem;
-  }
+  box-shadow: var(--rfd-shadow);
 }
 
 .rfd-sheet-grab {
